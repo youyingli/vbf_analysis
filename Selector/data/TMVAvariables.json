@@ -1,0 +1,19 @@
+{
+    "dijet" : 
+        {
+            "dijet_LeadJPt_"            : "Pt_{jet 1}"                      ,
+            "dijet_SubJPt_"             : "Pt_{jet 2}"                      ,
+            "dijet_abs_dEta_"           : "#Delta#eta(jj)"                  ,
+            "dijet_Mjj_"                : "M_{jj}"                          ,
+            "dijet_centrality_gg_"      : "C_{#gamma#gamma}"                ,
+            "dijet_dipho_dphi_trunc_"   : "#Delta(jj,#gamma#gamma)_{trunc}" ,
+            "dijet_dphi_"               : "#Delta#phi(jj)"                  ,
+            "dijet_minDRJetPho_"        : "min(#DeltaR(#gamma,jet))"        ,
+            "dipho_lead_ptoM_"          : "Pt_{#gamma 1}/M_{#gamma#gamma}"  ,
+            "dipho_sublead_ptoM_"       : "Pt_{#gamma 2}/M_{#gamma#gamma}"
+        }
+
+}
+
+
+

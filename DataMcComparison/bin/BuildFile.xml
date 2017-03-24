@@ -1,0 +1,7 @@
+<use name="boost"/>
+<use name="boost_system"/>
+<use name="boost_program_options"/>
+
+<use name="vbf_analysis/DataMcComparison"/>
+<bin name="MakePlot" file="MakePlot.cpp"/>
+<bin name="shape" file="shape.cpp"/>

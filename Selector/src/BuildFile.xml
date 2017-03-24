@@ -1,0 +1,9 @@
+<use name="boost_system"/>
+
+<use name="root"/>
+<use name="roottmva"/>
+<use name="roofit"/>
+<export>
+  <lib name="1"/>
+</export>
+

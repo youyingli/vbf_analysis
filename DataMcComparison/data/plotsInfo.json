@@ -1,0 +1,33 @@
+{
+
+    "h1_Mgg"                     :   "M_{#gamma#gamma} (GeV)"          , 
+    "h1_lead_phoPt"              :   "Pt_{#gamma 1} (GeV)"             , 
+    "h1_lead_phoEta"             :   "#eta_{#gamma 1}"                 , 
+    "h1_lead_phoId_mva"          :   "Photon1 ID MVA"                  , 
+    "h1_leadPho_PToM"            :   "Pt_{#gamma 1}/M_{#gamma#gamma}"  , 
+    "h1_subl_phoPt"              :   "Pt_{#gamma 2} (GeV)"             , 
+    "h1_subl_phoEta"             :   "#eta_{#gamma 2}"                 , 
+    "h1_subl_phoId_mva"          :   "Photon2 ID MVA"                  , 
+    "h1_sublPho_PToM"            :   "Pt_{#gamma 2}/M_{#gamma#gamma}"  , 
+    "h1_dipho_dEta"              :   "#Delta#eta(#gamma#gamma)"        , 
+    "h1_dipho_dphi"              :   "#Delta#phi(#gamma#gamma)"        ,                                 
+    "h1_Mjj"                     :   "M_{jj} (GeV)"                    , 
+    "h1_lead_jetPt"              :   "Pt_{jet 1} (GeV)"                , 
+    "h1_lead_jetEta"             :   "#eta_{jet 1}"                    , 
+    "h1_subl_jetPt"              :   "Pt_{jet 2} (GeV)"                , 
+    "h1_subl_jetEta"             :   "#eta_{jet 2}"                    , 
+    "h1_dijet_dEta"              :   "#Delta#eta(jj)"                  , 
+    "h1_dijet_dPhi"              :   "#Delta#phi(jj)"                  , 
+    "h1_dijet_Zep"               :   "Zeppenfeld"                      , 
+    "h1_dijet_dipho_dphi_trunc"  :   "#Delta(jj,#gamma#gamma)_{trunc}" , 
+    "h1_dijet_centrality_gg"     :   "C_{#gamma#gamma}"                , 
+    "h1_dijet_minDRJetPho"       :   "min(#DeltaR(#gamma,jet))"        , 
+    "h1_dipho_mva"               :   "diphoton MVA"                    , 
+    "h1_dijet_mva"               :   "dijet BDT"                       , 
+    "h1_dipho_dijet_mva"         :   "combined MVA"                    ,                                 
+    "h1_nvtx"                    :   "Nvtx"                            , 
+    "h1_dipho_dijet_dPt"         :   "Pt_{jj or jjj}-Pt_{#gamma#gamma}", 
+    "h1_dipho_massn"             :   "M_{#gamma#gamma} (GeV)"          , 
+    "h1_dipho_massp"             :   "M_{#gamma#gamma} (GeV)" 
+
+}

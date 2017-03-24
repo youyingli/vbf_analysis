@@ -1,0 +1,13 @@
+{
+
+    "ZJets":{
+
+        "DYjets" : { "file" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ZPlusJets",                  "xs" : 6025.0,   "br" : 1.0,  "nGen" : 96837626.0   }
+        },
+
+    "data":{
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_ZPlusJets", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 }
+
+    }
+
+}

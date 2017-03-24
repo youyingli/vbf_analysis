@@ -1,0 +1,61 @@
+{
+    "sig":{
+
+        "vbf_120" : { "file" : "VBFHToGG_M120_13TeV_amcatnlo_pythia8",                          "xs" : 3.9350,   "br" : 0.002218, "nGen" : 838800.0 },
+        "vbf_123" : { "file" : "VBFHToGG_M123_13TeV_amcatnlo_pythia8",                          "xs" : 3.8420,   "br" : 0.002258, "nGen" : 899600.0 },
+        "vbf_124" : { "file" : "VBFHToGG_M124_13TeV_amcatnlo_pythia8",                          "xs" : 3.8120,   "br" : 0.002266, "nGen" : 295200.0 },
+        "vbf_125" : { "file" : "VBFHToGG_M125_13TeV_amcatnlo_pythia8",                          "xs" : 3.7820,   "br" : 0.00227,  "nGen" : 1193600.0 },
+        "vbf_126" : { "file" : "VBFHToGG_M126_13TeV_amcatnlo_pythia8",                          "xs" : 3.7520,   "br" : 0.00227,  "nGen" : 300000.0 },
+        "vbf_127" : { "file" : "VBFHToGG_M127_13TeV_amcatnlo_pythia8",                          "xs" : 3.7230,   "br" : 0.002267, "nGen" : 900000.0 },
+        "vbf_130" : { "file" : "VBFHToGG_M130_13TeV_amcatnlo_pythia8",                          "xs" : 3.6370,   "br" : 0.002238, "nGen" : 850000.0 },
+        "ggh_120" : { "file" : "GluGluHToGG_M120_13TeV_amcatnloFXFX_pythia8",                   "xs" : 52.2200,  "br" : 0.002218, "nGen" : 428908.0 },
+        "ggh_123" : { "file" : "GluGluHToGG_M123_13TeV_amcatnloFXFX_pythia8",                   "xs" : 49.9800,  "br" : 0.002258, "nGen" : 432622.0 },
+        "ggh_124" : { "file" : "GluGluHToGG_M124_13TeV_amcatnloFXFX_pythia8",                   "xs" : 49.2700,  "br" : 0.002266, "nGen" : 435289.0 },
+        "ggh_125" : { "file" : "GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8",                   "xs" : 48.5800,  "br" : 0.00227,  "nGen" : 809384.0 },
+        "ggh_126" : { "file" : "GluGluHToGG_M126_13TeV_amcatnloFXFX_pythia8",                   "xs" : 47.8900,  "br" : 0.00227,  "nGen" : 712020.0 },
+        "ggh_127" : { "file" : "GluGluHToGG_M127_13TeV_amcatnloFXFX_pythia8",                   "xs" : 47.2300,  "br" : 0.002267, "nGen" : 435455.0 },
+        "ggh_130" : { "file" : "GluGluHToGG_M130_13TeV_amcatnloFXFX_pythia8",                   "xs" : 45.3100,  "br" : 0.002238, "nGen" : 433003.0 },
+        "tth_125" : { "file" : "ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2",         "xs" : 0.5071,   "br" : 0.00227,  "nGen" : 280760.0 },
+        "zh_120"  : { "file" : "ZHToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.5589,   "br" : 0.002218, "nGen" : 184301.0 },
+        "zh_123"  : { "file" : "ZHToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.3726,   "br" : 0.002258, "nGen" : 193544.0 },
+        "zh_124"  : { "file" : "ZHToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.3131,   "br" : 0.002266, "nGen" : 193130.0 },
+        "zh_125"  : { "file" : "ZHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.2569,   "br" : 0.00227,  "nGen" : 278811.0 },
+        "zh_126"  : { "file" : "ZHToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.2019,   "br" : 0.00227,  "nGen" : 191695.0 },
+        "zh_127"  : { "file" : "ZHToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.1486,   "br" : 0.002267, "nGen" : 190495.0 },
+        "zh_130"  : { "file" : "ZHToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 1.9989,   "br" : 0.002238, "nGen" : 183341.0 },
+        "wh_120"  : { "file" : "WHToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.5589,   "br" : 0.002218, "nGen" : 184301.0 }, 
+        "wh_123"  : { "file" : "WHToGG_M123_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.3726,   "br" : 0.002258, "nGen" : 193544.0 },
+        "wh_124"  : { "file" : "WHToGG_M124_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.3131,   "br" : 0.002266, "nGen" : 193130.0 },
+        "wh_125"  : { "file" : "WHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.2569,   "br" : 0.00227,  "nGen" : 278811.0 },
+        "wh_126"  : { "file" : "WHToGG_M126_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.2019,   "br" : 0.00227,  "nGen" : 191695.0 },
+        "wh_127"  : { "file" : "WHToGG_M127_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 2.1486,   "br" : 0.002267, "nGen" : 190495.0 },
+        "wh_130"  : { "file" : "WHToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8",                "xs" : 1.9989,   "br" : 0.002238, "nGen" : 183341.0 }
+
+        },
+
+    "bkg":{
+        
+        "dipho"  : { "file" : "DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa",                                 "xs" : 84.4,     "br" : 1.0,  "nGen" : 57861736.0   },
+
+        "gjet_promptfake" : { "file" : "GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_promptfake",   "xs" : 3216.0,   "br" : 1.0, "nGen" : 37274572.0 },
+        "gjet_fakefake"   : { "file" : "GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_fakefake",     "xs" : 3216.0,   "br" : 1.0, "nGen" : 37274572.0 },
+        "gjet_promptfake" : { "file" : "GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_promptfake",   "xs" : 220.0,    "br" : 1.0, "nGen" : 24989649.0 },
+        "gjet_fakefake"   : { "file" : "GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_fakefake",     "xs" : 220.0,    "br" : 1.0, "nGen" : 24989649.0 },
+        "gjet_promptfake" : { "file" : "GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_promptfake",  "xs" : 850.8,    "br" : 1.0, "nGen" : 72299185.0 },
+        "gjet_fakefake"   : { "file" : "GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_fakefake",    "xs" : 850.8,    "br" : 1.0, "nGen" : 72299185.0 },
+        "qcd_promptfake"  : { "file" : "QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_promptfake",    "xs" : 22110.0 , "br" : 1.0, "nGen" : 18009301.0 },
+        "qcd_fakefake"    : { "file" : "QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_fakefake",      "xs" : 22110.0 , "br" : 1.0, "nGen" : 18009301.0 },
+        "qcd_promptfake"  : { "file" : "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_promptfake",   "xs" : 113400.0 ,"br" : 1.0, "nGen" : 20632076.0 },
+        "qcd_fakefake"    : { "file" : "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8_fakefake",     "xs" : 113400.0 ,"br" : 1.0, "nGen" : 20632076.0 },
+        "qcd_promptfake"  : { "file" : "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_promptfake",    "xs" : 260500.0 ,"br" : 1.0, "nGen" : 37562075.0 },
+        "qcd_fakefake"    : { "file" : "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8_fakefake",      "xs" : 260500.0 ,"br" : 1.0, "nGen" : 37562075.0 },
+
+        "DYjets" : { "file" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",                  "xs" : 6025.0,   "br" : 1.0,  "nGen" : 96837626.0   }
+        },
+
+    "data":{
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 }
+
+    }
+
+}
