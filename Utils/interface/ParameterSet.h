@@ -5,7 +5,7 @@
 #define CANVX 600
 #define CANVY 700
 
-#define LEGXMIN 0.55
+#define LEGXMIN 0.5
 #define LEGXMAX 0.92
 #define LEGYMIN 0.71
 #define LEGYMAX 0.92

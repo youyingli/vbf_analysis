@@ -1,6 +1,9 @@
 <use name="boost"/>
 <use name="boost_system"/>
 <use name="boost_program_options"/>
-
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/PythonParameterSet"/>
 <use name="vbf_analysis/Selector"/>
-<bin name="Analysis_cfg" file="Analysis_cfg.cpp"/>
+
+<bin name="VBFTag" file="VBFTag.cpp"/>
+<bin name="ZPlusJets" file="ZPlusJets.cpp"/>

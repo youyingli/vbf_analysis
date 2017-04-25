@@ -8,15 +8,13 @@
 
 using namespace std;
 
-ZPlusJetsValidSelector::ZPlusJetsValidSelector(string infilename, string sampleType, string sampleName, string outdir):
+ZPlusJetsValidSelector::ZPlusJetsValidSelector(string indir, string infilename, string sampleName, string outdir):
+    indir_(indir),
     infilename_( infilename ),
-    sampleType_( sampleType ),
     sampleName_( sampleName ),
     outdir_( outdir )
 {
-    infile_ = TFile::Open(Form("%s",(infilename_+".root").c_str()));
-    std::size_t find_slash = infilename_.find_last_of("/");
-    infilename_ = infilename_.substr(find_slash+1, infilename_.size() - find_slash -1);
+    infile_ = TFile::Open((indir_ + infilename_ + ".root").c_str());
     if ( infile_ ) cout << "Successfully open " + infilename_ + " file."<< endl;
     else exit(0);
 }
@@ -61,7 +59,7 @@ void ZPlusJetsValidSelector::Initialization()
     inTree_ -> SetBranchAddress("nvtx"                    ,&nvtx                     );
     inTree_ -> SetBranchAddress("puweight"                ,&puweight                 );
     inTree_ -> SetBranchAddress("weight"                  ,&weight                   );
-    if (sampleType_ != "data") {
+    if (sampleName_ != "Data") {
         inTree_ -> SetBranchAddress("dijet_jet1_match"        ,&dijet_jet1_match         );
         inTree_ -> SetBranchAddress("dijet_jet2_match"        ,&dijet_jet2_match         );
     }
@@ -69,12 +67,11 @@ void ZPlusJetsValidSelector::Initialization()
 }
 
 
-void ZPlusJetsValidSelector::selectLoop( string level, string state )
+void ZPlusJetsValidSelector::SelectLoop(string state)
 {
     Initialization();
     if (state != "") state = "_" + state;
-
-    TFile* outfile = TFile::Open(Form("%s/Re_%s.root", outdir_.c_str(), (infilename_ + state +SystLabel_).c_str() ),"recreate");
+    TFile* outfile = TFile::Open(Form("%s/output_%s.root", outdir_.c_str(), (infilename_ + state + SystLabel_).c_str()) ,"recreate");
 
     //diPhoton variables
     TH1D* h1_Mgg                   = new TH1D("h1_Mgg"                     ,""   ,80  ,70.  ,110.   );    h1_Mgg                     -> Sumw2();      
@@ -90,21 +87,22 @@ void ZPlusJetsValidSelector::selectLoop( string level, string state )
     TH1D* h1_dipho_dphi            = new TH1D("h1_dipho_dphi"              ,""   ,40  ,0.   ,3.2    );    h1_dipho_dphi              -> Sumw2(); 
     //dijet variables
     TH1D* h1_Mjj                   = new TH1D("h1_Mjj"                     ,""   ,30  ,150. ,3500.  );    h1_Mjj                     -> Sumw2(); 
-    TH1D* h1_lead_jetPt            = new TH1D("h1_lead_jetPt"              ,""   ,30  ,20.  ,290.   );    h1_lead_jetPt              -> Sumw2(); 
+    TH1D* h1_lead_jetPt            = new TH1D("h1_lead_jetPt"              ,""   ,50  ,20.  ,270.   );    h1_lead_jetPt              -> Sumw2(); 
     TH1D* h1_lead_jetEta           = new TH1D("h1_lead_jetEta"             ,""   ,40  ,-5.  ,5.     );    h1_lead_jetEta             -> Sumw2(); 
-    TH1D* h1_subl_jetPt            = new TH1D("h1_subl_jetPt"              ,""   ,30  ,10.  ,160.   );    h1_subl_jetPt              -> Sumw2(); 
+    TH1D* h1_subl_jetPt            = new TH1D("h1_subl_jetPt"              ,""   ,50  ,20.  ,270.   );    h1_subl_jetPt              -> Sumw2(); 
     TH1D* h1_subl_jetEta           = new TH1D("h1_subl_jetEta"             ,""   ,40  ,-5.  ,5.     );    h1_subl_jetEta             -> Sumw2();
-    TH1D* h1_dijet_dEta            = new TH1D("h1_dijet_dEta"              ,""   ,30  ,2.   ,8.     );    h1_dijet_dEta              -> Sumw2(); 
+    TH1D* h1_dijet_dEta            = new TH1D("h1_dijet_dEta"              ,""   ,40  ,2.   ,8.     );    h1_dijet_dEta              -> Sumw2(); 
     TH1D* h1_dijet_dPhi            = new TH1D("h1_dijet_dPhi"              ,""   ,30  ,0.   ,3.3    );    h1_dijet_dPhi              -> Sumw2(); 
     TH1D* h1_dijet_Zep             = new TH1D("h1_dijet_Zep"               ,""   ,25  ,0.   ,8.     );    h1_dijet_Zep               -> Sumw2(); 
     TH1D* h1_dijet_dipho_dphi_trunc= new TH1D("h1_dijet_dipho_dphi_trunc"  ,""   ,30  ,0.   ,3.     );    h1_dijet_dipho_dphi_trunc  -> Sumw2(); 
     TH1D* h1_dijet_centrality_gg   = new TH1D("h1_dijet_centrality_gg"     ,""   ,25  ,0.   ,1.     );    h1_dijet_centrality_gg     -> Sumw2(); 
-    TH1D* h1_dijet_minDRJetPho     = new TH1D("h1_dijet_minDRJetPho"       ,""   ,40  ,0.   ,0.5    );    h1_dijet_minDRJetPho       -> Sumw2(); 
+    TH1D* h1_dijet_minDRJetPho     = new TH1D("h1_dijet_minDRJetPho"       ,""   ,40  ,0.   ,5.     );    h1_dijet_minDRJetPho       -> Sumw2(); 
     //MVA
     TH1D* h1_dipho_mva             = new TH1D("h1_dipho_mva"               ,""   ,40  ,-1.  ,1.     );    h1_dipho_mva               -> Sumw2(); 
+//    TH1D* h1_dijet_mva             = new TH1D("h1_dijet_mva"               ,""   ,25  ,0.2  ,1.     );    h1_dijet_mva               -> Sumw2(); 
     TH1D* h1_dijet_mva             = new TH1D("h1_dijet_mva"               ,""   ,25  ,0.2  ,1.     );    h1_dijet_mva               -> Sumw2(); 
-    //TH1D* h1_dijet_mva             = new TH1D("h1_dijet_mva"               ,""   ,25  ,-1.  ,1.     );    h1_dijet_mva               -> Sumw2(); 
-    TH1D* h1_dipho_dijet_mva       = new TH1D("h1_dipho_dijet_mva"         ,""   ,40  ,-0.2 ,1.     );    h1_dipho_dijet_mva         -> Sumw2(); 
+//    TH1D* h1_dipho_dijet_mva       = new TH1D("h1_dipho_dijet_mva"         ,""   ,40  ,-0.2 ,1.     );    h1_dipho_dijet_mva         -> Sumw2(); 
+    TH1D* h1_dipho_dijet_mva       = new TH1D("h1_dipho_dijet_mva"         ,""   ,40  ,-1. ,1.      );    h1_dipho_dijet_mva         -> Sumw2(); 
     //Extra
     TH1D* h1_nvtx                  = new TH1D("h1_nvtx"                    ,""   ,40  ,0.   ,40.    );    h1_nvtx                    -> Sumw2(); 
 
@@ -113,84 +111,58 @@ void ZPlusJetsValidSelector::selectLoop( string level, string state )
     for ( int entry=0;entry<inTree_->GetEntries();entry++ ) {
         inTree_->GetEntry(entry);
         
-        bool loose_cut  = (   dipho_lead_ptoM>(1./4) && dipho_sublead_ptoM>(1./5)
-                           && dijet_LeadJPt>30.      && dijet_SubJPt>20.       
-                           && dijet_Mjj>100.         &&(dipho_mass>70. && dipho_mass<110.)
-                            );
-        bool medium_cut = true; 
-                          //...
-                          
-                          
-                          
-                          
-                          
-        bool tight_cut  = true;
-                          //...
-                          
-                          
-                          
-                          
-                          
+//        bool selections =    dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
+//                          && dijet_LeadJPt>40.      && dijet_SubJPt>30.       
+//                          && dijet_Mjj>250.         &&(dipho_mass>80. && dipho_mass<100.);
 
-        bool select = true;
+        bool selections = (   dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
+                           && dipho_leadIDMVA>0.     && dipho_subleadIDMVA>0. 
+                           && dijet_LeadJPt>40.      && dijet_SubJPt>40.
+                           && fabs(dijet_leadEta)<4.7&& fabs(dijet_subleadEta)<4.7
+                           && dijet_Mjj>150.         && dijet_abs_dEta>2
+                           && dijet_mva>0.2          && (dipho_mass>70. && dipho_mass<110.)
+                          );
         bool jetcut = true;
-        if      ( level == "Loose"  )  select = loose_cut;
-        else if ( level == "Medium" )  select = medium_cut;
-        else if ( level == "Tight"  )  select = tight_cut;
-        else {cout <<"Don't find cut level. Loose cut is applied !!!"<<endl; select = loose_cut;}
-        if ( sampleType_ != "data" ) {
-            bool jet1fake = (dijet_jet1_match == 0. && dijet_jet2_match == 1.); 
-            bool jet2fake = (dijet_jet1_match == 1. && dijet_jet2_match == 0.);
-            bool bothfakes = (dijet_jet1_match == 0. && dijet_jet2_match == 0.);
-            bool bothmatch = (dijet_jet1_match == 1. && dijet_jet2_match == 1.);
-            if      ( state == "_jet1fake"  )  jetcut = jet1fake;
-            else if ( state == "_jet2fake"  )  jetcut = jet2fake;
-            else if ( state == "_bothfakes" )  jetcut = bothfakes; 
-            else if ( state == "_bothmatch" )  jetcut = bothmatch;
+        if (sampleName_ != "data") {
+            if      ( state == "_jet1fake"  )  jetcut = (dijet_jet1_match == 0. && dijet_jet2_match == 1.);
+            else if ( state == "_jet2fake"  )  jetcut = (dijet_jet1_match == 1. && dijet_jet2_match == 0.);
+            else if ( state == "_bothfake" )   jetcut = (dijet_jet1_match == 0. && dijet_jet2_match == 0.);
+            else if ( state == "_bothmatch" )  jetcut = (dijet_jet1_match == 1. && dijet_jet2_match == 1.);
         }
         
-        if ( !(select && jetcut) ) continue;
+        if (!(selections && jetcut)) continue;
 
         double dipho_dEta = fabs( dipho_leadEta - dipho_subleadEta );
         double dipho_dphi = fabs( dipho_leadPhi - dipho_subleadPhi );
 
-        double totalWeight = 1;
-        if ( sampleType_ != "data" ) {
-            if (isGenWeight_) totalWeight = weight * lumi_;
-            else totalWeight = eventWeight_ * puweight;
-        }
-
-        h1_Mgg                       ->Fill( dipho_mass               ,totalWeight ); 
-        h1_lead_phoPt                ->Fill( dipho_leadPt             ,totalWeight ); 
-        h1_lead_phoEta               ->Fill( dipho_leadEta            ,totalWeight ); 
-        h1_lead_phoId_mva            ->Fill( dipho_leadIDMVA          ,totalWeight ); 
-        h1_leadPho_PToM              ->Fill( dipho_lead_ptoM          ,totalWeight ); 
-        h1_subl_phoPt                ->Fill( dipho_subleadPt          ,totalWeight ); 
-        h1_subl_phoEta               ->Fill( dipho_subleadEta         ,totalWeight ); 
-        h1_subl_phoId_mva            ->Fill( dipho_subleadIDMVA       ,totalWeight ); 
-        h1_sublPho_PToM              ->Fill( dipho_sublead_ptoM       ,totalWeight ); 
-        h1_dipho_dEta                ->Fill( dipho_dEta               ,totalWeight ); 
-        h1_dipho_dphi                ->Fill( dipho_dphi               ,totalWeight ); 
-        h1_Mjj                       ->Fill( dijet_Mjj                ,totalWeight ); 
-        h1_lead_jetPt                ->Fill( dijet_LeadJPt            ,totalWeight ); 
-        h1_lead_jetEta               ->Fill( dijet_leadEta            ,totalWeight ); 
-        h1_subl_jetPt                ->Fill( dijet_SubJPt             ,totalWeight ); 
-        h1_subl_jetEta               ->Fill( dijet_subleadEta         ,totalWeight ); 
-        h1_dijet_dEta                ->Fill( dijet_abs_dEta           ,totalWeight ); 
-        h1_dijet_dPhi                ->Fill( dijet_dphi               ,totalWeight ); 
-        h1_dijet_Zep                 ->Fill( dijet_Zep                ,totalWeight ); 
-        h1_dijet_dipho_dphi_trunc    ->Fill( dijet_dipho_dphi_trunc   ,totalWeight ); 
-        h1_dijet_centrality_gg       ->Fill( dijet_centrality_gg      ,totalWeight ); 
-        h1_dijet_minDRJetPho         ->Fill( dijet_minDRJetPho        ,totalWeight ); 
-        h1_dipho_mva                 ->Fill( dipho_mva                ,totalWeight ); 
-        h1_dijet_mva                 ->Fill( dijet_mva                ,totalWeight ); 
-        h1_dipho_dijet_mva           ->Fill( dipho_dijet_MVA          ,totalWeight ); 
-        h1_nvtx                      ->Fill( nvtx                     ,totalWeight ); 
+        h1_Mgg                       ->Fill( dipho_mass               ,weight ); 
+        h1_lead_phoPt                ->Fill( dipho_leadPt             ,weight ); 
+        h1_lead_phoEta               ->Fill( dipho_leadEta            ,weight ); 
+        h1_lead_phoId_mva            ->Fill( dipho_leadIDMVA          ,weight ); 
+        h1_leadPho_PToM              ->Fill( dipho_lead_ptoM          ,weight ); 
+        h1_subl_phoPt                ->Fill( dipho_subleadPt          ,weight ); 
+        h1_subl_phoEta               ->Fill( dipho_subleadEta         ,weight ); 
+        h1_subl_phoId_mva            ->Fill( dipho_subleadIDMVA       ,weight ); 
+        h1_sublPho_PToM              ->Fill( dipho_sublead_ptoM       ,weight ); 
+        h1_dipho_dEta                ->Fill( dipho_dEta               ,weight ); 
+        h1_dipho_dphi                ->Fill( dipho_dphi               ,weight ); 
+        h1_Mjj                       ->Fill( dijet_Mjj                ,weight ); 
+        h1_lead_jetPt                ->Fill( dijet_LeadJPt            ,weight ); 
+        h1_lead_jetEta               ->Fill( dijet_leadEta            ,weight ); 
+        h1_subl_jetPt                ->Fill( dijet_SubJPt             ,weight ); 
+        h1_subl_jetEta               ->Fill( dijet_subleadEta         ,weight ); 
+        h1_dijet_dEta                ->Fill( dijet_abs_dEta           ,weight ); 
+        h1_dijet_dPhi                ->Fill( dijet_dphi               ,weight ); 
+        h1_dijet_Zep                 ->Fill( dijet_Zep                ,weight ); 
+        h1_dijet_dipho_dphi_trunc    ->Fill( dijet_dipho_dphi_trunc   ,weight ); 
+        h1_dijet_centrality_gg       ->Fill( dijet_centrality_gg      ,weight ); 
+        h1_dijet_minDRJetPho         ->Fill( dijet_minDRJetPho        ,weight ); 
+        h1_dipho_mva                 ->Fill( dipho_mva                ,weight ); 
+        h1_dijet_mva                 ->Fill( dijet_mva                ,weight ); 
+        h1_dipho_dijet_mva           ->Fill( dipho_dijet_MVA          ,weight ); 
+        h1_nvtx                      ->Fill( nvtx                     ,weight ); 
 
     }//entry++
-
-    sbevents_ = h1_Mgg->Integral();
-    outfilename_ = "Re_" + infilename_ + state + SystLabel_ ;
 
     cout << "[INFO]: Dumping of "<<infilename_<<".root is finished !!!" << endl;
 
@@ -199,28 +171,8 @@ void ZPlusJetsValidSelector::selectLoop( string level, string state )
 
 }
 
-void ZPlusJetsValidSelector::setEventWeight( double wgt, bool isGenWeight )
-{
-    eventWeight_  = wgt;
-    isGenWeight_ =isGenWeight;
-}
-
-void ZPlusJetsValidSelector::setLumi( double lumi )
-{
-    lumi_ = lumi;
-}
-
-void ZPlusJetsValidSelector::setSystLabel( string SystLabel )
+void ZPlusJetsValidSelector::SetSystLabel( string SystLabel )
 {
     SystLabel_ = SystLabel;
 }
 
-double ZPlusJetsValidSelector::GetSBenents()
-{
-    return sbevents_;
-}
-
-string ZPlusJetsValidSelector::GetOutFileName()
-{
-    return outfilename_;
-}

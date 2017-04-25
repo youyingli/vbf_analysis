@@ -54,7 +54,14 @@
         },
 
     "data":{
-        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 }
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunB", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunC", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunD", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunE", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunF", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunG", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 },
+        "Data" : { "file" : "DoubleEG-ReMiniAOD-03Feb2017_RunH", "xs" : 1.0, "br" : 1.0, "nGen" : 1.0 }
 
     }
 

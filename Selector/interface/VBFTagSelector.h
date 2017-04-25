@@ -9,34 +9,23 @@
 class VBFTagSelector{
 
     public:
-        VBFTagSelector( std::string infilename, std::string samepletype, std::string sampleName, std::string outdir );
+        VBFTagSelector(std::string indir, std::string infilename, std::string sampleName, std::string outdir);
         ~VBFTagSelector();
-        void selectLoop( std::string level, bool isSideBand = true );
-        void setLumi(double lumi = 1);
-        void setEventWeight( double wgt, bool isGenWeight = false );
-        void setSystLabel( std::string SystLabel );
-        void outputMVAvars( bool outmva = true );
-        void doworkspace( bool dows = true );
-        double GetSBenents();
-        std::string GetOutFileName();
-        //void doSystematics(bool dosyst = false);
-
+        void SetSignalRegion(double min, double max);
+        void selectLoop(bool isSideBand = true);
+        void SetSystLabel(std::string SystLabel = "");
 
     private:
 
         TFile* infile_;
         TTree* inTree_;
+        std::string indir_;
         std::string infilename_;
-        std::string sampleType_;
         std::string sampleName_;
         std::string SystLabel_;
         std::string outdir_;
-
-        double eventWeight_;
-        double lumi_;
-        bool isGenWeight_;
-        bool outmva_;
-        bool dows_;
+        double min_;
+        double max_;
 
         void Initialization();
         Float_t dipho_mass              ; 
@@ -62,6 +51,7 @@ class VBFTagSelector{
         Float_t dijet_Zep               ; 
         Float_t dijet_dipho_dphi_trunc  ; 
         Float_t dijet_minDRJetPho       ;
+        Float_t dijet_centrality_gg     ;
         Float_t dijet_mva               ; 
         Float_t dipho_mva               ; 
         Float_t dipho_dijet_MVA         ; 
@@ -82,7 +72,6 @@ class VBFTagSelector{
         Float_t jet3_mass               ; 
 
         //outTree
-        //BDT
         Float_t dijet_LeadJPt_           ;
         Float_t dijet_SubJPt_            ;
         Float_t dijet_abs_dEta_          ;
@@ -95,9 +84,6 @@ class VBFTagSelector{
         Float_t dipho_sublead_ptoM_      ;
         Float_t dipho_mva_               ;
         Float_t dipho_dijet_MVA_         ;
-
-        double sbevents_;
-        std::string outfilename_;
 
 
 };

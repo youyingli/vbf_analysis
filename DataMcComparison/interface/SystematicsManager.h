@@ -1,12 +1,15 @@
 #ifndef __SYSTEMATICSMANAGER__
 #define __SYSTEMATICSMANAGER__
 
+#include "vbf_analysis/Utils/interface/TH1Service.hpp"
+
 #include <string>
 #include <vector>
-
+#include <utility>
 
 class SystematicsManager{
 
+    typedef std::vector<std::pair<double,double>> PairVector;
 
     public:
         SystematicsManager( std::string plotname );
@@ -15,18 +18,13 @@ class SystematicsManager{
         void AddSystLabel(std::string SystLabel);
         void ErrorPropagator(double scale);
         
-
-        std::vector<double> GetSystUpError(){ return UpError_; }
-        std::vector<double> GetSystDownError(){ return DownError_; }
-
-
+        PairVector GetSystError(){ return SystError; }
 
     private:
         std::string plotname_;
-        std::vector<double> UpError_;
-        std::vector<double> DownError_;
         std::vector<std::string> Collection_;
         std::vector<std::string> SystLabels_;
+        PairVector SystError;
 
 };
 

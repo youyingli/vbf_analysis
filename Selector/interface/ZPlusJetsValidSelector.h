@@ -9,29 +9,20 @@
 class ZPlusJetsValidSelector{
 
     public:
-        ZPlusJetsValidSelector( std::string infilename, std::string samepletype, std::string sampleName, std::string outdir );
+        ZPlusJetsValidSelector(std::string indir, std::string infilename, std::string sampleName, std::string outdir);
         ~ZPlusJetsValidSelector();
-        void selectLoop( std::string level, std::string state );
-        void setLumi(double lumi = 1);
-        void setEventWeight( double wgt, bool isGenWeight = false );
-        void setSystLabel( std::string SystLabel );
-        double GetSBenents();
-        std::string GetOutFileName();
-
+        void SelectLoop(std::string state = "");
+        void SetSystLabel(std::string SystLabel = "");
 
     private:
 
         TFile* infile_;
         TTree* inTree_;
+        std::string indir_;
         std::string infilename_;
-        std::string sampleType_;
         std::string sampleName_;
         std::string SystLabel_;
         std::string outdir_;
-
-        double eventWeight_;
-        double lumi_;
-        bool isGenWeight_;
 
         void Initialization();
         Float_t dipho_mass              ; 
@@ -67,10 +58,6 @@ class ZPlusJetsValidSelector{
 
         Float_t dijet_jet1_match        ;
         Float_t dijet_jet2_match        ;
-
-        double sbevents_;
-        std::string outfilename_;
-
 
 };
 

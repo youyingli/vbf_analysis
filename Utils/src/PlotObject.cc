@@ -53,51 +53,6 @@ TPad* NormalPad(){
 return pad;
 }
 
-TH1D* newH1LinePlot( TH1D* RAWplot, Color_t color, Style_t style ){
-
-    TH1D* plot = (TH1D*)RAWplot -> Clone();
-    plot -> SetLineColor(color);
-    plot -> SetLineStyle(style);
-    plot -> SetLineWidth(3);//Fixed
-    plot -> SetFillColorAlpha(kWhite,0.);
-    plot -> SetTitleFont(42,"xyz");
-    plot -> SetLabelFont(42,"xyz");
-    plot -> SetLabelSize(0.04,"xyz");
-    plot -> SetTitleSize(0.04,"xyz");
-
-return plot;
-}
-
-TH1D* newH1FillPlot( TH1D* RAWplot, Color_t color, Style_t style ){
-
-    TH1D* plot = (TH1D*)RAWplot -> Clone();
-    plot -> SetLineColor(kBlack);    
-    plot -> SetLineStyle(1);
-    plot -> SetLineWidth(2);//Fixed
-    plot -> SetFillColorAlpha(color,1.);
-    plot -> SetFillStyle(style);
-    plot -> SetTitleFont(42,"xyz");
-    plot -> SetLabelFont(42,"xyz");
-    plot -> SetLabelSize(0.04,"xyz");
-    plot -> SetTitleSize(0.04,"xyz");
-
-return plot;
-}
-
-TH1D* newH1PointPlot( TH1D* RAWplot ){
-
-    TH1D* plot = (TH1D*)RAWplot -> Clone();
-    plot -> SetLineColor(kBlack);
-    plot -> SetMarkerSize(0.8);
-    plot -> SetMarkerStyle(20);
-    plot -> SetTitleFont(42,"xyz");
-    plot -> SetLabelFont(42,"xyz");
-    plot -> SetLabelSize(0.04,"xyz");
-    plot -> SetTitleSize(0.04,"xyz");
-
-return plot;
-}
-
 TLegend* newLegend(){
 
     TLegend* legend = new TLegend(LEGXMIN, LEGYMIN, LEGXMAX, LEGYMAX);
