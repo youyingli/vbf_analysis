@@ -111,17 +111,10 @@ void ZPlusJetsValidSelector::SelectLoop(string state)
     for ( int entry=0;entry<inTree_->GetEntries();entry++ ) {
         inTree_->GetEntry(entry);
         
-//        bool selections =    dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
-//                          && dijet_LeadJPt>40.      && dijet_SubJPt>30.       
-//                          && dijet_Mjj>250.         &&(dipho_mass>80. && dipho_mass<100.);
+        bool selections =    dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
+                          && dijet_LeadJPt>40.      && dijet_SubJPt>30.       
+                          && dijet_Mjj>250.         &&(dipho_mass>80. && dipho_mass<100.);
 
-        bool selections = (   dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
-                           && dipho_leadIDMVA>0.     && dipho_subleadIDMVA>0. 
-                           && dijet_LeadJPt>40.      && dijet_SubJPt>40.
-                           && fabs(dijet_leadEta)<4.7&& fabs(dijet_subleadEta)<4.7
-                           && dijet_Mjj>150.         && dijet_abs_dEta>2
-                           && dijet_mva>0.2          && (dipho_mass>70. && dipho_mass<110.)
-                          );
         bool jetcut = true;
         if (sampleName_ != "data") {
             if      ( state == "_jet1fake"  )  jetcut = (dijet_jet1_match == 0. && dijet_jet2_match == 1.);

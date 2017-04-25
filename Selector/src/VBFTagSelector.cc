@@ -138,19 +138,9 @@ void VBFTagSelector::selectLoop(bool isSideBand)
     for (int entry=0; entry<inTree_->GetEntries(); entry++) {
         inTree_->GetEntry(entry);
 
-//        bool selections = (   dipho_lead_ptoM>(1./4) && dipho_sublead_ptoM>(1./5)
-//                           && dijet_LeadJPt>30.      && dijet_SubJPt>20.       
-//                           && dijet_Mjj>100.         &&(dipho_mass>100. && dipho_mass<180.)
-//                          );
-        
-        
-        bool selections = (   dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
-                           && dipho_leadIDMVA>0.     && dipho_subleadIDMVA>0.
-                           && dijet_LeadJPt>40.      && dijet_SubJPt>30.
-                           && fabs(dijet_leadEta)<4.7&& fabs(dijet_subleadEta)<4.7
-                           && dijet_Mjj> 150.        && dijet_abs_dEta>2.
-                           && dijet_mva>0.2          && (dipho_mass>100. && dipho_mass<180.)
-//                           && dipho_dijet_MVA > 0.5
+        bool selections = (   dipho_lead_ptoM>(1./4) && dipho_sublead_ptoM>(1./5)
+                           && dijet_LeadJPt>30.      && dijet_SubJPt>20.       
+                           && dijet_Mjj>100.         &&(dipho_mass>100. && dipho_mass<180.)
                           );
 
         if ( !selections ) continue;
