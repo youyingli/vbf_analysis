@@ -30,7 +30,7 @@ return pad;
 
 TPad* BottomPad(){
     
-    TPad* pad = new TPad("Pad1","Pad1",0.,0.0,1.,0.26);
+    TPad* pad = new TPad("Pad1","Pad1",0.,0.0,1.,0.258);
     pad->SetTicks(1.,1.);
     pad->SetTopMargin(0.0);
     pad->SetBottomMargin(0.35);

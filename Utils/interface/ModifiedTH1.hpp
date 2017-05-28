@@ -32,11 +32,12 @@ class ModifiedTH1 {
         void AddPlot ( T* plot );
         void Reset ();
         void SetBinContent ( std::vector<std::pair<double,double>> contentset );
-
+        void NormalizeToOne ();
 
         T* GetObject () { return plot_; }
         const double GetWeightEventN ( double min, double max );
-        const double GetEventN ();
+        const double GetEventN () { return plot_->Integral(); }
+        const double GetBinWidth () { return plot_->GetXaxis()->GetBinWidth(1); }
         const int GetNbinsX () { return nbin_; }
         const double GetMaxContent () { return plot_ -> GetMaximum(); }
         std::vector<std::pair<double,double>> GetBinContent ();

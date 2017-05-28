@@ -113,6 +113,14 @@ void ModifiedTH1<T>::SetScaleWeight ( double scaleweight )
 }
 
 template <typename T>
+void ModifiedTH1<T>::NormalizeToOne ()
+{
+    double factor = plot_->Integral();
+    if (factor > 0.) plot_ -> Scale(1./factor);
+    else cout <<"Have zero or minus entries, please check it" << endl;
+}
+
+template <typename T>
 void ModifiedTH1<T>::SetXYaxis ( string xLabel, string yLabel, string invisible )
 {
     plot_ -> GetXaxis() -> SetTitle( xLabel.c_str() );
@@ -124,7 +132,6 @@ void ModifiedTH1<T>::SetXYaxis ( string xLabel, string yLabel, string invisible 
         plot_ -> GetYaxis()->SetLabelSize(0.);
     }
 }
-// set/get  bincontent add
 
 template <typename T>
 const double ModifiedTH1<T>::GetWeightEventN ( double min, double max )
@@ -132,12 +139,6 @@ const double ModifiedTH1<T>::GetWeightEventN ( double min, double max )
     int minbin = plot_ -> FindBin( min );
     int maxbin = plot_ -> FindBin( max );
     return plot_ -> Integral( minbin, maxbin );
-}
-
-template <typename T>
-const double ModifiedTH1<T>::GetEventN ()
-{
-    return plot_ -> Integral();
 }
 
 template <typename T>
@@ -152,6 +153,7 @@ void ModifiedTH1<T>::SetYaxisRange (double ymin, double ymax)
     plot_ -> SetMinimum( ymin );
     plot_ -> SetMaximum( ymax );
 }
+
 //Content
 template <typename T>
 void ModifiedTH1<T>::WriteInFile ()

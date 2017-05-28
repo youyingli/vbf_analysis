@@ -1,0 +1,4 @@
+<use name="vbf_analysis/FinalFit"/>
+<use name="roofit"/>
+
+<bin name="aa" file="test.cpp"/>
