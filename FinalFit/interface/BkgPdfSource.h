@@ -1,6 +1,8 @@
 #ifndef __BKGPDFSOURCE__
 #define __BKGPDFSOURCE__
 
+#include <string>
+
 #include "RooRealVar.h"
 #include "RooAbsPdf.h"
 
