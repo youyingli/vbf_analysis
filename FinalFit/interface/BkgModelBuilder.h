@@ -22,9 +22,11 @@ class BkgModelBuilder {
         void SetBkgPdfSource (std::vector<std::string> bkgpdf);
         void FTestSelector (int last_order);
         void MakeEnvelopePlot ();
+        void SetSignalPdf (std::map<std::string, RooExtendPdf*> exsigpdf);
 
     private:
 
+        bool hasSignal_;
         std::string bestpdf_;
         int bestorder_;
         RooRealVar* mass_;
@@ -33,10 +35,10 @@ class BkgModelBuilder {
 
         std::vector<std::string> bkgpdfset_;
         vector_pair finalbkgcand_;
+        std::map<std::string, RooExtendPdf*> exsigpdf_;
 
         std::map<std::string, int> FirstFTest (int last_order);
         void FinalFTest (std::map<std::string, int> pdfcand);
-
         double GetGoodnessOfFit (RooAbsPdf* testPdf);
 
 };

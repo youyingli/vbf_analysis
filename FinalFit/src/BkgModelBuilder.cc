@@ -17,6 +17,7 @@ BkgModelBuilder::BkgModelBuilder (RooRealVar* mass, RooDataSet* data, string out
     data_(data),
     outdir_(outdir)
 {
+    hasSignal_ = false;
 }
 
 BkgModelBuilder::~BkgModelBuilder ()
@@ -31,8 +32,8 @@ void BkgModelBuilder::MakeEnvelopePlot ()
     }
     EnvelopeBuilder envelopeBuilder (mass_, data_, multipdf, outdir_);
     envelopeBuilder.SetBestPdf (EnvelopePdf(mass_, bestpdf_, bestorder_));
+    if (hasSignal_) envelopeBuilder.SetSignalPdf(exsigpdf_);
     envelopeBuilder.BuilderCore ();
-
 }
 
 void BkgModelBuilder::FTestSelector (int last_order = 7)
@@ -171,6 +172,12 @@ void BkgModelBuilder::FinalFTest (map<string, int> pdfcand)
 void BkgModelBuilder::SetBkgPdfSource (vector<string> bkgpdf)
 {
     bkgpdfset_ = bkgpdf;
+}
+
+void BkgModelBuilder::SetSignalPdf (map<string, RooExtendPdf*> exsigpdf)
+{
+    exsigpdf_ = exsigpdf;
+    hasSignal_ = true;
 }
 
 

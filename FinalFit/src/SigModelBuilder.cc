@@ -27,7 +27,7 @@ void SigModelBuilder::FTestSelector ()
     int pre_order = 0;
     int best_order = 0;
     double thisNll = 0;
-    double preNll = 0;
+    double preNll = 10e8;
     double chi2 = 0;
     double prob = 0;
     int status = 0;
@@ -45,7 +45,7 @@ void SigModelBuilder::FTestSelector ()
         status = fitres->status();
         printf("............ This order = %d, Pre Order = %d ,p-value = %1.2e, status = %d \n",order,pre_order,prob,status);
         if(prob > 0.05) break;
-        SigPdfSet.push_back(SigCandPdf);
+        SigPdfSet_.push_back(SigCandPdf);
         pre_order = order;
         preNll = thisNll;
     }
@@ -67,7 +67,7 @@ void SigModelBuilder::AlterFTestSelector ()
     double prob = 0;
     int status = 0;
 
-    for (int order = 1; order < 7; order++) {
+    for (int order = 1; order < 4; order++) {
     
         RooAbsPdf* SigCandPdf = MultiGaussians(samplename_, mass_, order, MH);
         RooFitResult* fitres = SigCandPdf->fitTo(*data_,Minimizer("Minuit2","minimize"),Save(true),Verbose(false),SumW2Error(true),Range(115.,135.));
@@ -77,8 +77,9 @@ void SigModelBuilder::AlterFTestSelector ()
         prob = TMath::Prob(chi2, 2 * order + (order - 1));
         status = fitres->status();
         printf("............ This order = %d, Pre Order = %d ,p-value = %1.2e, status = %d \n",order,pre_order,prob,status);
-        if(prob > 0.05) break;
-        SigPdfSet.push_back(SigCandPdf);
+        //if(prob > 0.05) break;
+        if(prob > 999) break;
+        SigPdfSet_.push_back(SigCandPdf);
         pre_order = order;
     }
     
@@ -88,15 +89,42 @@ void SigModelBuilder::AlterFTestSelector ()
 
 void SigModelBuilder::MakeFTestPlot ()
 {
-    
 
+    int color[7] = {kBlue,kRed,kMagenta,kGreen+1,kOrange+7,kAzure+10,kBlack};
+    RooPlot* sframe = mass_->frame(Bins(40),Range(115.,135.));
+    data_->plotOn(sframe,MarkerStyle(20));
+    TObject *pdfLeg0 = sframe->getObject(int(sframe->numItems())-1);
+    TLegend leg(0.7,0.7,1.,0.92);
+    leg.AddEntry(pdfLeg0,Form("%s_125",samplename_.c_str()),"LP");
+                                                                                         
+    int order = 1;
+    for (const auto& it : SigPdfSet_){
+        it->plotOn(sframe,LineColor(color[order-1]));
+        TObject *pdfLeg = sframe->getObject(int(sframe->numItems()-1));
+        leg.AddEntry(pdfLeg,Form("%d order",order),"L");
+        order++;
+    }
+    TCanvas canv("canv","canv",700,600);
+    TPad pad("pad","",0.,0.,0.98,0.98);
+    canv.cd();
+    pad.SetLeftMargin(0.20);
+    pad.SetRightMargin(0.03);
+    pad.Draw();
+    pad.cd();
+    sframe->SetXTitle("M_{#gamma#gamma} (GeV)");
+    sframe->GetYaxis()->SetTitleOffset(1.35);
+    sframe->Draw();
+    leg.SetFillStyle(0);
+    leg.SetBorderSize(0);
+    leg.Draw();
+    canv.Print(Form("%s/%s.pdf", outdir_.c_str(), samplename_.c_str()));
 }
 
 RooExtendPdf* SigModelBuilder::GetBestOfFitPdf ()
 {
     RooRealVar* norm = new RooRealVar("norm","",data_->sumEntries(),-1000.,10000000.);
     norm->setConstant(true);
-    RooExtendPdf* extsigpdf = new RooExtendPdf(Form("%s_Extend", samplename_.c_str()), "", *(SigPdfSet.back()), *norm);
+    RooExtendPdf* extsigpdf = new RooExtendPdf(Form("%s_Extend", samplename_.c_str()), "", *(SigPdfSet_.back()), *norm);
     
     return extsigpdf;
 }

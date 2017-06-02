@@ -32,7 +32,7 @@ class SigModelBuilder {
         std::string samplename_;
         std::string outdir_;
 
-        std::vector<RooAbsPdf*> SigPdfSet;
+        std::vector<RooAbsPdf*> SigPdfSet_;
 
 };
 

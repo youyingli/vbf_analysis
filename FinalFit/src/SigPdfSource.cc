@@ -11,7 +11,7 @@ using namespace std;
 using namespace RooFit;
 
 
-RooAbsPdf* MultiGaussians (RooRealVar* mass, int nGaussians, int mh, string signame) {
+RooAbsPdf* MultiGaussians (string signame, RooRealVar* mass, int nGaussians, int mh) {
 
     RooArgList* gaussians = new RooArgList();
     RooArgList* coeffs = new RooArgList();
@@ -19,7 +19,7 @@ RooAbsPdf* MultiGaussians (RooRealVar* mass, int nGaussians, int mh, string sign
     MH->setConstant(true);
 
     for (int i = 0; i < nGaussians; i++) {
-        RooRealVar*  dm    = new RooRealVar(Form("%s_dm_mh%d_g%d",signame.c_str(),mh,i),Form("%s_dm_mh%d_g%d",signame.c_str(),mh,i),0.1,-8.,8.);
+        RooRealVar*  dm    = new RooRealVar(Form("%s_dm_mh%d_g%d",signame.c_str(),mh,i),Form("%s_dm_mh%d_g%d",signame.c_str(),mh,i),0.1,-3.,3.);
         RooAbsReal*  mean  = new RooFormulaVar(Form("%s_mean_mh%d_g%d",signame.c_str(),mh,i),Form("%s_mean_mh%d_g%d",signame.c_str(),mh,i),"@0+@1",RooArgList(*MH,*dm));
         RooRealVar*  sigma = new RooRealVar(Form("%s_sigma_mh%d_g%d",signame.c_str(),mh,i),Form("%s_sigma_mh%d_g%d",signame.c_str(),mh,i),2.,0.4,20.);
         RooGaussian* gaus  = new RooGaussian(Form("%s_gaus_mh%d_g%d",signame.c_str(),mh,i),Form("%s_gaus_mh%d_g%d",signame.c_str(),mh,i),*mass,*mean,*sigma);
@@ -30,7 +30,7 @@ RooAbsPdf* MultiGaussians (RooRealVar* mass, int nGaussians, int mh, string sign
             coeffs->add(*frac);
         }
     }
-    RooAddPdf* tmpMultiGaussians = new RooAddPdf(Form("PDF_%s%d",signame.c_str(),mh),Form("PDF_%s%d",signame.c_str(),mh),*gaussians,*coeffs,kTRUE);
+    RooAddPdf* tmpMultiGaussians = new RooAddPdf(Form("PDF_%s%d",signame.c_str(),mh),Form("PDF_%s%d",signame.c_str(),mh),*gaussians,*coeffs);
     return tmpMultiGaussians;
 }
 

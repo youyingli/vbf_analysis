@@ -6,6 +6,7 @@
 
 #include "TMath.h"
 
+#include "RooAddPdf.h"
 #include "RooExtendPdf.h"
 #include "RooPlot.h"
 #include "RooMinimizer.h"
@@ -24,6 +25,7 @@ EnvelopeBuilder::EnvelopeBuilder (RooRealVar* var, RooDataSet* data, vector<RooA
     multipdf_(multipdf),
     outdir_(outdir)
 {
+    hasSignal_ = false;
 }
 
 EnvelopeBuilder::~EnvelopeBuilder ()
@@ -185,45 +187,60 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     oneSigmaband_r->SetMarkerColor(kGreen);
 
 //    RooPlot*splot = var_-> frame();
-/*
-    if(addsignal){
-       sigPDF["ggf"]->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(1));
-       RooCurve* ggfCurve = (RooCurve*)plot->getObject(plot->numItems()-1);
-       sigPDF["ggf"]->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kBlue),LineWidth(1),FillColor(38),FillStyle(3001),DrawOption("F"));
-       TObject* ggfleg = (TObject*)plot->getObject(plot->numItems()-1);
-       sigPDF["vbf"]->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(1));
-       RooCurve* vbfCurve = (RooCurve*)plot->getObject(plot->numItems()-1);
-       sigPDF["vbf"]->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(1),FillColor(46),FillStyle(3001),DrawOption("F"));
-       TObject* vbfleg = (TObject*)plot->getObject(plot->numItems()-1);
-       leg.AddEntry(vbfleg,"vbf(M_{H} = 126GeV)","F");
-       leg.AddEntry(ggfleg,"ggf(M_{H} = 126GeV)","F");
-       RooRealVar fvbf("fvbf","",vbfCurve->average(100.,180.)*80.,0.,1000.); fvbf.setConstant(true);
-       RooRealVar fggf("fggf","",ggfCurve->average(100.,180.)*80.,0.,1000.); fggf.setConstant(true);
-       RooAddPdf sigTotalPdf("total","",RooArgList(*sigPDF["ggf"],*sigPDF["vbf"]),RooArgList(fggf,fvbf));
-       sigTotalPdf.plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kViolet+2),LineWidth(4),LineStyle(2));
-       TObject* totalleg = (TObject*)plot->getObject(plot->numItems()-1);
-       leg.AddEntry(totalleg,"vbf+ggf(M_{H} = 126GeV}","L");
-       if(combine){
-           sigTotalPdf.plotOn(splot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(3),LineStyle(1));
-           RooRealVar fsig("fsig","",fvbf.getValV()+fggf.getValV(),0.,100000.); fsig.setConstant(true);
-           RooRealVar fbkg("fbkg","",bestPdfcurve->average(100.,180.)*80.,0.,100000.); fbkg.setConstant(true);
-           RooAddPdf TotalPDF("TotalPDF","",RooArgList(*bestpdf_,sigTotalPdf),RooArgList(fbkg,fsig));
-           TotalPDF.plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(3),LineStyle(1));
-       }
+
+    RooArgList* sigpdfset = new RooArgList();
+    RooArgList* sigpdfsetf = new RooArgList();
+    RooAddPdf* sigTotalPdf = 0;
+    int color[7] = {kBlue,kRed,kMagenta,kGreen+1,kOrange+7,kAzure+10,kBlack};
+    if (hasSignal_) {
+        int i = 0;
+        for (const auto& it : exsigpdf_) {
+            //it.second->plotOn(plot, Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(color[i]), LineWidth(1));
+            it.second->plotOn(plot, Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(color[i]), LineWidth(1), Invisible());
+            RooCurve* curve = (RooCurve*)plot->getObject(plot->numItems()-1);
+            RooRealVar* number = new RooRealVar(it.first.c_str(), "", curve->average(100.,180.)*80., 0., 1000000.); 
+            number->setConstant(true);
+            //it.second->plotOn(plot,Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(color[i]), LineWidth(1), FillColor(color[i]), FillStyle(3001), DrawOption("F"));
+            //leg->AddEntry((TObject*)plot->getObject(plot->numItems()-1), Form("%s (M_{H} = 125GeV)",it.first.c_str()), "F");
+            sigpdfset->add(*(it.second));
+            sigpdfsetf->add(*number);
+            i++;
+        }
+        sigTotalPdf = new RooAddPdf("total", "", *sigpdfset, *sigpdfsetf);
+        //sigTotalPdf->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kViolet+2),LineWidth(3),LineStyle(2));
+        sigTotalPdf->plotOn(plot, Normalization(1.0,RooAbsReal::RelativeExpected), LineColor(kBlue), LineWidth(3));
+        sigTotalPdf->plotOn(plot, Normalization(1.0,RooAbsReal::RelativeExpected), LineColor(kBlue), LineWidth(3), FillColor(kBlue), FillStyle(3001), DrawOption("F"));
+        //leg->AddEntry((TObject*)plot->getObject(plot->numItems()-1), "Total(M_{H} = 125GeV)", "L");
+        leg->AddEntry((TObject*)plot->getObject(plot->numItems()-1), "Signal (M_{H} = 125GeV)", "L");
+       /* if (combine) {
+            sigTotalPdf.plotOn(splot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(3),LineStyle(1));
+            RooRealVar fsig("fsig","",fvbf.getValV()+fggf.getValV(),0.,100000.); fsig.setConstant(true);
+            RooRealVar fbkg("fbkg","",bestPdfcurve->average(100.,180.)*80.,0.,100000.); fbkg.setConstant(true);
+            RooAddPdf TotalPDF("TotalPDF","",RooArgList(*bestpdf_,sigTotalPdf),RooArgList(fbkg,fsig));
+            TotalPDF.plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(3),LineStyle(1));
+        }*/
+        
     }
-*/
+
     if (isblind) {
        var_->setRange("unblind_low",100.,115.);
        var_->setRange("unblind_high",135.,180.);
-       data_->plotOn(plot,Binning(80),CutRange("unblind_low,unblind_high"),MarkerSize(0.9),XErrorSize(0));
+       data_->plotOn(plot,Binning(80),CutRange("unblind_low,unblind_high"),MarkerSize(0.8),XErrorSize(0));
     } else {
-       data_->plotOn(plot,Binning(80),MarkerSize(0.9));
+       data_->plotOn(plot,Binning(80),MarkerSize(0.8));
     }
 
     plot->Draw("same");
     leg->Draw("same");
 
     ARTKIT::SetCMSandLUMI(35.87);
+    TLatex lex;
+    lex.SetNDC(true);
+    lex.SetTextFont(62);
+    lex.SetTextSize(0.045);
+    lex.DrawLatex(0.22, 0.875, "VBF dijet tag");
+    lex.SetTextFont(42);
+    lex.DrawLatex(0.22, 0.825, "H #rightarrow #gamma#gamma");
 
     canv.Update();
     canv.cd();
@@ -241,7 +258,7 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
         plotdata->GetPoint(i,xtmp,ytmp);
         double bkgvalue = bestPdfcurve->interpolate(xtmp);
         if (isblind) {
-            if(xtmp>115.&&xtmp<135.) continue;
+            if(xtmp > 115. && xtmp < 135.) continue;
         }
         double errorUp = plotdata -> GetErrorYhigh(i);
         double errorDown = plotdata -> GetErrorYlow(i);
@@ -281,7 +298,7 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     }*/
     hdatasub->Draw("PESAME");
     hdatasub->SetMarkerStyle(20);
-    hdatasub->SetMarkerSize(0.9);
+    hdatasub->SetMarkerSize(0.8);
 
     canv.Update();
     canv.Print(Form("%s/envelopepdf.pdf",outdir_.c_str()));
@@ -299,4 +316,10 @@ void EnvelopeBuilder::SetRangeAndRes (double resolution, double min, double max)
     resolution_ = resolution;
     min_ = min;
     max_ = max;
+}
+
+void EnvelopeBuilder::SetSignalPdf (map<string, RooExtendPdf*> exsigpdf)
+{
+    exsigpdf_ = exsigpdf;
+    hasSignal_ = true;
 }
