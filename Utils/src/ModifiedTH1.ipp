@@ -7,197 +7,188 @@
 using namespace std;
 
 template <typename T>
-ModifiedTH1<T>::ModifiedTH1 ( string name, int nbin, double min, double max ):
-    name_( name ),
-    nbin_( nbin ),
-    min_( min ),
-    max_( max )
+ModifiedTH1<T>::ModifiedTH1 (const string& name, int nbin, double min, double max):
+    _plot( new T(name.c_str(), "", nbin, min, max) )
 {
-    plot_ = new T( name_.c_str(), "", nbin_, min_, max );
-    plot_ -> Sumw2();
+    _plot->Sumw2();
 }
 
 template <typename T>
-ModifiedTH1<T>::ModifiedTH1 ( T* plot )
+ModifiedTH1<T>::ModifiedTH1 (T* plot):
+    _plot ( new T(*plot) )
 {
-    nbin_ = plot -> GetNbinsX();
-    plot_ = new T(*plot);
 }
 
 template <typename T>
 ModifiedTH1<T>::~ModifiedTH1 ()
 {
-    delete plot_;
+    delete _plot;
 }
 
 //copy constructor
 template <typename T>
-ModifiedTH1<T>::ModifiedTH1 ( const ModifiedTH1<T>& modifiedTH1 )
+ModifiedTH1<T>::ModifiedTH1 (const ModifiedTH1<T>& modifiedTH1)
 {
-    nbin_  = modifiedTH1.nbin_;
-    min_   = modifiedTH1.min_;
-    max_   = modifiedTH1.max_;
-    name_  = modifiedTH1.name_;
-    plot_ = new T();
-    *plot_ = *(modifiedTH1.plot_);
+    _plot = new T();
+    *_plot = *(modifiedTH1._plot);
 }
 
 template <typename T>
 void ModifiedTH1<T>::ResetArtStyle ()
 {
-    plot_ -> ResetAttLine ();//111
-    plot_ -> ResetAttFill ();//10
-    plot_ -> ResetAttMarker ();//111
+    _plot->ResetAttLine();  //Default:111
+    _plot->ResetAttFill();  //Default:10
+    _plot->ResetAttMarker();//Default:111
 }
 
 template <typename T>
-void ModifiedTH1<T>::ConvertToLinePlot ( Color_t color, Style_t style )
-{
-    ResetArtStyle ();
-    plot_ -> SetLineColor(color);
-    plot_ -> SetLineStyle(style);
-    plot_ -> SetLineWidth(3);//Fixed
-    plot_ -> SetTitleFont(42,"xyz");
-    plot_ -> SetLabelFont(42,"xyz");
-    plot_ -> SetLabelSize(0.04,"xyz");
-    plot_ -> SetTitleSize(0.04,"xyz");
-}
-
-template <typename T>
-void ModifiedTH1<T>::ConvertToFillPlot ( Color_t color, Style_t style )
-{
-    ResetArtStyle ();
-    plot_ -> SetLineWidth(2);//Fixed
-    plot_ -> SetFillColor(color);
-    plot_ -> SetFillStyle(style);
-    plot_ -> SetTitleFont(42,"xyz");
-    plot_ -> SetLabelFont(42,"xyz");
-    plot_ -> SetLabelSize(0.04,"xyz");
-    plot_ -> SetTitleSize(0.04,"xyz");
-}
-
-template <typename T>
-void ModifiedTH1<T>::ConvertToPointPlot ( Color_t color, Style_t style, Size_t size )
-{
-    ResetArtStyle ();
-    plot_ -> SetLineColor(color);
-    plot_ -> SetMarkerColor(color);
-    plot_ -> SetMarkerStyle(style);
-    plot_ -> SetMarkerSize(size);
-    plot_ -> SetTitleFont(42,"xyz");
-    plot_ -> SetLabelFont(42,"xyz");
-    plot_ -> SetLabelSize(0.04,"xyz");
-    plot_ -> SetTitleSize(0.04,"xyz");
-}
-
-template <typename T>
-void ModifiedTH1<T>::ConvertToBoxErrorPlot ( Color_t color, double transparency ) 
+void ModifiedTH1<T>::ConvertToLinePlot (Color_t color, Style_t style)
 {
     ResetArtStyle();
-    plot_ -> SetLineWidth(2);
-    plot_ -> SetFillStyle(1001);
-    plot_ -> SetFillColorAlpha( color, 1. - transparency );
-    plot_ -> SetMarkerColorAlpha( color, 0. );
+    _plot->SetLineColor(color);
+    _plot->SetLineStyle(style);
+    _plot->SetLineWidth(3);//Fixed
+    SetCommonAxis();
 }
 
 template <typename T>
-void ModifiedTH1<T>::Draw ( string DrawOption )
+void ModifiedTH1<T>::ConvertToFillPlot (Color_t color, Style_t style)
 {
-    plot_ -> Draw( DrawOption.c_str() );
+    ResetArtStyle ();
+    _plot->SetLineWidth(2);//Fixed
+    _plot->SetFillColor(color);
+    _plot->SetFillStyle(style);
+    SetCommonAxis();
 }
 
 template <typename T>
-void ModifiedTH1<T>::SetScaleWeight ( double scaleweight )
+void ModifiedTH1<T>::ConvertToPointPlot (Color_t color, Style_t style, Size_t size)
 {
-    plot_ -> Scale( scaleweight );
+    ResetArtStyle ();
+    _plot->SetLineColor(color);
+    _plot->SetMarkerColor(color);
+    _plot->SetMarkerStyle(style);
+    _plot->SetMarkerSize(size);
+    _plot->GetYaxis()->SetTitleOffset(1.2);
+}
+
+template <typename T>
+void ModifiedTH1<T>::ConvertToBoxErrorPlot (Color_t color, double transparency) 
+{
+    ResetArtStyle();
+    _plot->SetLineWidth(2);
+    _plot->SetFillStyle(1001);
+    _plot->SetFillColorAlpha(color, 1. - transparency);
+    _plot->SetMarkerColorAlpha(color, 0.);
+}
+
+template <typename T>
+void ModifiedTH1<T>::Draw (const string& DrawOption)
+{
+    _plot->Draw(DrawOption.c_str());
+}
+
+template <typename T>
+void ModifiedTH1<T>::SetScaleWeight (double scaleweight)
+{
+    _plot->Scale(scaleweight);
 }
 
 template <typename T>
 void ModifiedTH1<T>::NormalizeToOne ()
 {
-    double factor = plot_->Integral();
-    if (factor > 0.) plot_ -> Scale(1./factor);
-    else cout <<"Have zero or minus entries, please check it" << endl;
+    double factor = _plot->Integral();
+    if (factor > 0.) _plot->Scale(1./factor);
+    else cout << "Have zero or minus entries, please check it" << endl;
 }
 
 template <typename T>
-void ModifiedTH1<T>::SetXYaxis ( string xLabel, string yLabel, string invisible )
+void ModifiedTH1<T>::SetXYaxis (const string& xLabel, const string& yLabel, const string& invisible)
 {
-    plot_ -> GetXaxis() -> SetTitle( xLabel.c_str() );
-    plot_ -> GetXaxis() -> SetTitle( yLabel.c_str() );
-    if (invisible == "X" ) plot_ -> GetXaxis()->SetLabelSize(0.);
-    if (invisible == "Y" ) plot_ -> GetYaxis()->SetLabelSize(0.);
-    if (invisible == "XY" ) {
-        plot_ -> GetXaxis()->SetLabelSize(0.);
-        plot_ -> GetYaxis()->SetLabelSize(0.);
+    _plot->GetXaxis()->SetTitle(xLabel.c_str());
+    _plot->GetXaxis()->SetTitle(yLabel.c_str());
+    if (invisible == "X") _plot->GetXaxis()->SetLabelSize(0.);
+    if (invisible == "Y") _plot->GetYaxis()->SetLabelSize(0.);
+    if (invisible == "XY") {
+        _plot->GetXaxis()->SetLabelSize(0.);
+        _plot->GetYaxis()->SetLabelSize(0.);
     }
 }
 
 template <typename T>
-const double ModifiedTH1<T>::GetWeightEventN ( double min, double max )
+double ModifiedTH1<T>::GetWeightEventN (double min, double max) const
 {
-    int minbin = plot_ -> FindBin( min );
-    int maxbin = plot_ -> FindBin( max );
-    return plot_ -> Integral( minbin, maxbin );
+    int minbin = _plot->FindBin(min);
+    int maxbin = _plot->FindBin(max);
+    return _plot->Integral(minbin, maxbin);
 }
 
 template <typename T>
 void ModifiedTH1<T>::FillEvent (double value, double weight)
 {
-    plot_ -> Fill( value, weight );
+    _plot->Fill(value, weight);
 }
 
 template <typename T>
 void ModifiedTH1<T>::SetYaxisRange (double ymin, double ymax)
 {
-    plot_ -> SetMinimum( ymin );
-    plot_ -> SetMaximum( ymax );
+    _plot->SetMinimum(ymin);
+    _plot->SetMaximum(ymax);
 }
 
-//Content
 template <typename T>
 void ModifiedTH1<T>::WriteInFile ()
 {
-    plot_ -> Write();
+    _plot->Write();
 }
 
 template <typename T>
 void ModifiedTH1<T>::Reset ()
 {
+    _plot->Reset();
     ResetArtStyle();
-    plot_ -> Reset();
 }
 
 //Add
 template <typename T>
 void ModifiedTH1<T>::AddPlot (T* plot)
 {
-    plot_ -> Add( plot );
+    _plot->Add(plot);
 }
 
 template <typename T>
-vector<pair<double,double>> ModifiedTH1<T>::GetBinContent ()
+vector<pair<double,double>> ModifiedTH1<T>::GetBinContent () const
 {
     vector<pair<double,double>> contentset;
-    for ( int i = 0; i < nbin_; i++ ) 
-        contentset.emplace_back( make_pair( plot_->GetBinContent(i+1), plot_->GetBinError(i+1) ) );
+    for (int i = 0; i < _plot->GetNbinsX(); i++) 
+        contentset.emplace_back(make_pair(_plot->GetBinContent(i+1), _plot->GetBinError(i+1)));
     return contentset;
 }
 
 template <typename T>
-void ModifiedTH1<T>::SetBinContent ( vector<pair<double,double>> contentset )
+void ModifiedTH1<T>::SetBinContent (const vector<pair<double,double>>& contentset)
 {
-    if (contentset.size()!=nbin_) {
+    if (contentset.size() != (unsigned int)_plot->GetNbinsX()) {
         cout << "[ERROR] : Nbin of input contents doesn't match Nbin of this plot." << endl;
-        cout << contentset.size() << "    "<< nbin_ << endl;
         exit(1);
     }
-    int i = 0;
-    for ( const auto& it : contentset ) {
-        plot_->SetBinContent(i+1,it.first);
-        plot_->SetBinError(i+1,it.second);
+    int i = 1;
+    for (const auto& it : contentset) {
+        _plot->SetBinContent(i, it.first);
+        _plot->SetBinError(i, it.second);
         i++;
     }
 }
+
+template <typename T>
+void ModifiedTH1<T>::SetCommonAxis ()
+{
+    _plot->SetTitleFont(42,"xyz");
+    _plot->SetLabelFont(42,"xyz");
+    _plot->SetLabelSize(0.04,"xyz");
+    _plot->SetTitleSize(0.04,"xyz");
+    _plot->GetYaxis()->SetTitleOffset(1.2);
+}
+
 
 #endif

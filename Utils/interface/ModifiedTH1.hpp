@@ -13,42 +13,40 @@ template <typename T>
 class ModifiedTH1 {
 
     public:
-        ModifiedTH1 ( std::string name, int nbin, double min, double max );
-        ModifiedTH1 ( T* plot );
-        ModifiedTH1 ( const ModifiedTH1& modifiedTH1 );
+        ModifiedTH1 (const std::string& name, int nbin, double min, double max);
+        ModifiedTH1 (T* plot);
+        ModifiedTH1 (const ModifiedTH1& modifiedTH1);
         ~ModifiedTH1 ();
 
         void ResetArtStyle ();
-        void ConvertToLinePlot ( Color_t color, Style_t style );
-        void ConvertToFillPlot ( Color_t color, Style_t style );
-        void ConvertToPointPlot ( Color_t color, Style_t style, Size_t size );
-        void ConvertToBoxErrorPlot ( Color_t color, double transparency );
-        void Draw( std::string DrawOption );
-        void SetScaleWeight ( double scaleweight );
-        void SetXYaxis ( std::string xLabel, std::string yLabel, std::string invisible = "" );
-        void FillEvent ( double value, double weight );
-        void SetYaxisRange ( double ymin, double ymax );
+        void ConvertToLinePlot (Color_t color, Style_t style);
+        void ConvertToFillPlot (Color_t color, Style_t style);
+        void ConvertToPointPlot (Color_t color, Style_t style, Size_t size);
+        void ConvertToBoxErrorPlot (Color_t color, double transparency);
+        void Draw(const std::string& DrawOption);
+        void SetScaleWeight (double scaleweight);
+        void SetXYaxis (const std::string& xLabel, const std::string& yLabel, const std::string& invisible = "");
+        void FillEvent (double value, double weight);
+        void SetYaxisRange (double ymin, double ymax);
         void WriteInFile ();
-        void AddPlot ( T* plot );
+        void AddPlot (T* plot);
         void Reset ();
-        void SetBinContent ( std::vector<std::pair<double,double>> contentset );
+        void SetBinContent (const std::vector<std::pair<double,double>>& contentset);
         void NormalizeToOne ();
 
-        T* GetObject () { return plot_; }
-        const double GetWeightEventN ( double min, double max );
-        const double GetEventN () { return plot_->Integral(); }
-        const double GetBinWidth () { return plot_->GetXaxis()->GetBinWidth(1); }
-        const int GetNbinsX () { return nbin_; }
-        const double GetMaxContent () { return plot_ -> GetMaximum(); }
-        std::vector<std::pair<double,double>> GetBinContent ();
-        std::pair<double,double> GetXRange () { return std::make_pair(plot_->GetXaxis()-> GetXmin(),plot_->GetXaxis()-> GetXmax()); }
+        T* GetObject () const {return _plot;}
+        double GetWeightEventN (double min, double max) const;
+        double GetEventN () const {return _plot->Integral();}
+        double GetBinWidth () const {return _plot->GetXaxis()->GetBinWidth(1);}
+        int GetNbinsX () const {return _plot->GetNbinsX();}
+        double GetMaxContent () const {return _plot -> GetMaximum();}
+        std::vector<std::pair<double,double>> GetBinContent () const;
+        std::pair<double,double> GetXRange () const {return std::make_pair(_plot->GetXaxis()->GetXmin(), _plot->GetXaxis()->GetXmax());}
     private:
-        std::string name_;
-        double nbin_;
-        double min_;
-        double max_;
-        T* plot_;
+        T* _plot;
 
+        //private function
+        void SetCommonAxis();
 };
 
 #include "vbf_analysis/Utils/src/ModifiedTH1.ipp"
