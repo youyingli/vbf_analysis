@@ -5,52 +5,54 @@
 
 #include <iostream>
 using namespace std;
+using namespace plotmgr;
 
 template <typename TH1Type>
 TH1Service<TH1Type>::TH1Service ()
 {
-    isfile_ = false;
+    _isdelete = true;
 }
 
 template <typename TH1Type>
 TH1Service<TH1Type>::~TH1Service()
 {   
-    if (isfile_) for( const auto& it : fileset_ ) it->Close();
+    if (!_isdelete) Close();
 }
 
 template <typename TH1Type>
-void TH1Service<TH1Type>::AddNewTH1 ( string name, int nbin, double min, double max )
+void TH1Service<TH1Type>::AddNewTH1 (const string& name, int nbin, double min, double max)
 {
-    th1set_.emplace( name, new ModifiedTH1<TH1Type>( name, nbin, min, max ) );
+    _th1set.emplace(name, new ModifiedTH1<TH1Type>(name, nbin, min, max)); _isdelete = false;
 }
 
 template <typename TH1Type>
-void TH1Service<TH1Type>::AddPlotFromFile ( string name, string plotname, string filename )
+void TH1Service<TH1Type>::AddPlotFromFile (const string& name, const string& plotname, const string& filename)
 {
-    TFile* file = TFile::Open( filename.c_str() );
-    if ( file -> IsZombie() ) {
-        cout <<"[ERROR]: " << file << "can not be found !" << endl;
-        exit ( EXIT_FAILURE );
+    TFile* file = TFile::Open(filename.c_str());
+    if (file->IsZombie()) {
+        cout << "[ERROR]: " << file << "can not be found !" << endl;
+        exit(EXIT_FAILURE);
     }
-    TH1Type* plot = (TH1Type*)file-> Get( plotname.c_str() );
-    th1set_.emplace( name, new ModifiedTH1<TH1Type>( plot ) );
-    fileset_.emplace_back(file);
-    isfile_ = true;
+    TH1Type* plot = (TH1Type*)file->Get(plotname.c_str());
+    plot->SetDirectory(0);
+    _th1set.emplace(name, new ModifiedTH1<TH1Type>(plot)); _isdelete = false;
+    file->Close();
 }
 
 
 template <typename TH1Type>
-void TH1Service<TH1Type>::Delete ( string name ) 
+void TH1Service<TH1Type>::Delete (const string& name) 
 {
-    delete th1set_[name];
-    th1set_[name] = NULL;
-    th1set_.erase(name);
+    delete _th1set[name];
+    _th1set[name] = NULL;
+    _th1set.erase(name);
 }
 
 template <typename TH1Type>
 void TH1Service<TH1Type>::Close ()
 {
-    for ( const auto& it : th1set_ ) delete it.second;
+    for (const auto& it : _th1set) delete it.second;
+    _isdelete = true;
 }
 
 #endif

@@ -7,16 +7,17 @@
 #include "TLegend.h"
 #include "TLine.h"
 
-namespace ARTKIT{
+#include <string>
 
-    extern TCanvas* signalCanvas();
-    extern TPad* TopPad();
-    extern TPad* BottomPad();
-    extern TPad* NormalPad();
-    extern TLegend* newLegend();
-    extern TH1D* ratioPlot(TH1D* hNumerator, TH1D* hDenominator, std::string xTitle, std::string yTitle);
-    extern TLine* horizontalLine(TH1D* plot, double y, Color_t color, Style_t style, Width_t width);
-
+namespace plotmgr
+{
+    extern TCanvas* NewCanvas();
+    extern TPad* NewTopPad();
+    extern TPad* NewBottomPad();
+    extern TPad* NewNormalPad();
+    extern TLegend* NewLegend();
+    extern TH1D* RatioPlot(TH1D* hNumerator, TH1D* hDenominator, const std::string& xTitle, const std::string& yTitle);
+    extern TLine* NewHorizontalLine(TH1D* plot, double y, Color_t color, Style_t style, Width_t width);
 };
 
 #endif

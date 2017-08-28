@@ -3,64 +3,65 @@
 #include <iostream>
 using namespace std;
 
-ScaleFactorCalculator::ScaleFactorCalculator(string controlplot):
-    controlplot_(controlplot)
+
+ScaleFactorCalculator::ScaleFactorCalculator (const string& controlplot):
+    _controlplot(controlplot)
 {
 }
 
-ScaleFactorCalculator::~ScaleFactorCalculator()
+ScaleFactorCalculator::~ScaleFactorCalculator ()
 {
-    th1service_.Close();
+    _th1service.Close();
 }
 
-void ScaleFactorCalculator::SetRemoveRange(double min, double max)
+void ScaleFactorCalculator::SetRemoveRange (double min, double max)
 {
-    RemoveRange_.emplace_back(make_pair(min, max));
+    _RemoveRange.emplace_back(make_pair(min, max));
 }
 
-void ScaleFactorCalculator::SetKeepRange(double min, double max)
+void ScaleFactorCalculator::SetKeepRange (double min, double max)
 {
-    KeepRange_ = make_pair(min, max);
+    _KeepRange = make_pair(min, max);
 }
 
-void ScaleFactorCalculator::SetMCSamples(vector<string> infiles)
+void ScaleFactorCalculator::SetMCSamples (const vector<string>& infiles)
 {
     int i = 1;
-    for (const auto& it : infiles) {
+    for (const auto& it_infile : infiles) {
         if ( i==1 ) {
-            th1service_.AddPlotFromFile("TotalMC",controlplot_,it);
+            _th1service.AddPlotFromFile("TotalMC", _controlplot, it_infile);
             i++;
         } else {
-            th1service_.AddPlotFromFile(to_string(i),controlplot_,it);
-            th1service_.GetPlot("TotalMC")->AddPlot(th1service_.GetPlot(to_string(i))->GetObject());
+            _th1service.AddPlotFromFile(to_string(i), _controlplot, it_infile);
+            _th1service.GetPlot("TotalMC")->AddPlot(_th1service.GetPlot(to_string(i))->GetObject());
             i++;
         }
     }
 }
 
-void ScaleFactorCalculator::SetData(string infile)
+void ScaleFactorCalculator::SetData(const string& infile)
 {
-    th1service_.AddPlotFromFile("data",controlplot_,infile);
+    _th1service.AddPlotFromFile("data", _controlplot, infile);
 }
 
-double ScaleFactorCalculator::GetScaleFactor()
+double ScaleFactorCalculator::GetScaleFactor() 
 {
     double NrMC = 0;
     double Nrdata = 0;
-    if ( !(RemoveRange_.empty()) )
-    for (const auto& it : RemoveRange_) {
-        NrMC += th1service_.GetPlot("TotalMC")->GetWeightEventN(it.first, it.second);
-        Nrdata += th1service_.GetPlot("data")->GetWeightEventN(it.first, it.second);
-    }
-    double NMC = th1service_.GetPlot("TotalMC")->GetWeightEventN(KeepRange_.first,KeepRange_.second) - NrMC;
-    double Ndata = th1service_.GetPlot("data")->GetWeightEventN(KeepRange_.first,KeepRange_.second) - Nrdata;
+    if ( !(_RemoveRange.empty()) )
+        for (const auto& it : _RemoveRange) {
+            NrMC += _th1service.GetPlot("TotalMC")->GetWeightEventN(it.first, it.second);
+            Nrdata += _th1service.GetPlot("data")->GetWeightEventN(it.first, it.second);
+        }
+    double NMC = _th1service.GetPlot("TotalMC")->GetWeightEventN(_KeepRange.first, _KeepRange.second) - NrMC;
+    double Ndata = _th1service.GetPlot("data")->GetWeightEventN(_KeepRange.first, _KeepRange.second) - Nrdata;
     double scalefactor = (NMC==0)? 0.: Ndata/NMC;   
 
-    cout << "Scale factor = " << scalefactor/weight_ << endl;
-    return scalefactor/weight_;
+    cout << "Scale factor = " << scalefactor/_weight << endl;
+    return scalefactor/_weight;
 }
 
 void ScaleFactorCalculator::SetExtraWeight(double weight)
 {
-    weight_ = weight;
+    _weight = weight;
 }

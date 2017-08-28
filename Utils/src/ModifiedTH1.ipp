@@ -5,6 +5,7 @@
 
 #include <iostream>
 using namespace std;
+using namespace plotmgr;
 
 template <typename T>
 ModifiedTH1<T>::ModifiedTH1 (const string& name, int nbin, double min, double max):

@@ -1,8 +1,6 @@
 #include "TStyle.h"
 
-
-namespace ARTKIT{
-
+namespace plotmgr
+{
     void SetGlobalStyle();
-
 }

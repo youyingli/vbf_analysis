@@ -7,16 +7,16 @@ template <typename T>
 class VectorTool{
 
     public:
-        VectorTool(){};
-        ~VectorTool(){};
+        VectorTool () {};
+        ~VectorTool () {};
 
-        void Append(std::vector<T> invector) {
-            for (const auto& it : invector) combinedvector.emplace_back(it);
+        void Append(const std::vector<T>& invector) {
+            for (const auto& it : invector) _combinedvector.emplace_back(it);
         }
-        std::vector<T> Output() { return combinedvector; }
+        std::vector<T> Output() const {return _combinedvector;}
 
     private:
-        std::vector<T> combinedvector;
+        std::vector<T> _combinedvector;
 };
 
 #endif
