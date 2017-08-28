@@ -1,5 +1,5 @@
-#ifndef __TLATEX__
-#define __TLATEX__
+#ifndef __SETCMSMARK__
+#define __SETCMSMARK__
 
 
 #include "TLatex.h"

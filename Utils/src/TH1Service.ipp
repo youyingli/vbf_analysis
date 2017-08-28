@@ -35,10 +35,10 @@ void TH1Service<TH1Type>::AddPlotFromFile (const string& name, const string& plo
     }
     TH1Type* plot = (TH1Type*)file->Get(plotname.c_str());
     plot->SetDirectory(0);
-    _th1set.emplace(name, new ModifiedTH1<TH1Type>(plot)); _isdelete = false;
     file->Close();
+    _th1set.emplace(name, new ModifiedTH1<TH1Type>(plot)); _isdelete = false;
+    plot->Delete();
 }
-
 
 template <typename TH1Type>
 void TH1Service<TH1Type>::Delete (const string& name) 
