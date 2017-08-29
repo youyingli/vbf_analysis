@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "TH1D.h"
-#include "vbf_analysis/Utils/interface/plotmgrlib.h"
+#include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
 
 class ScaleFactorCalculator{

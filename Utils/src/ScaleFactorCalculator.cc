@@ -26,16 +26,15 @@ void ScaleFactorCalculator::SetKeepRange (double min, double max)
 
 void ScaleFactorCalculator::SetMCSamples (const vector<string>& infiles)
 {
-    int i = 1;
+    int count = 1;
     for (const auto& it_infile : infiles) {
-        if ( i==1 ) {
+        if (count == 1) {
             _th1service.AddPlotFromFile("TotalMC", _controlplot, it_infile);
-            i++;
         } else {
-            _th1service.AddPlotFromFile(to_string(i), _controlplot, it_infile);
-            _th1service.GetPlot("TotalMC")->AddPlot(_th1service.GetPlot(to_string(i))->GetObject());
-            i++;
+            _th1service.AddPlotFromFile(to_string(count), _controlplot, it_infile);
+            _th1service.GetPlot("TotalMC")->AddPlot(_th1service.GetPlot(to_string(count))->GetSnapShot());
         }
+        count++;
     }
 }
 

@@ -37,7 +37,7 @@ namespace plotmgr
             void SetBinContent (const std::vector<std::pair<double,double>>& contentset);
             void NormalizeToOne ();
     
-            T* GetObject () const {return _plot;}
+            T* GetSnapShot () const {return (T*)_plot->Clone();}
             double GetWeightEventN (double min, double max) const;
             double GetEventN () const {return _plot->Integral();}
             double GetBinWidth () const {return _plot->GetXaxis()->GetBinWidth(1);}
