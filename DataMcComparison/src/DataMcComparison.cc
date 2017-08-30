@@ -6,192 +6,192 @@
 
 using namespace std;
 
-DataMcComparison::DataMcComparison(string type, string plotName, string outDir):
-    type_(type),
-    plotName_(plotName),
-    outDir_(outDir)
+DataMcComparison::DataMcComparison(const string& type, const string& plotname, const string& outdir):
+    _type(type),
+    _plotname(plotname),
+    _outdir(outdir)
 {
-    system(Form("mkdir -p %s",outDir_.c_str()));
-    stackPlot_ = new THStack("hs","");
-    legend = ARTKIT::newLegend();
-    legend-> SetNColumns(2);
-    isSignal_ = false;
-    isBkg_    = false;
-    isData_   = false;
-    doSysts_  = false;
+    system(Form("mkdir -p %s", _outdir.c_str()));
+    _stackplot = new THStack("hs", "");
+    _legend = plotmgr::NewLegend();
+    _legend->SetNColumns(2);
+    _issignal = false;
+    _isbkg    = false;
+    _isdata   = false;
+    _dosysts  = false;
 }
 
 DataMcComparison::~DataMcComparison()
 {
-    delete stackPlot_;
-    stackPlot_ = NULL;
-    th1service.Close();
+    delete _stackplot;
+    _stackplot = NULL;
+    _th1service.Close();
 }
 
-void DataMcComparison::SetData(string fileName)
+void DataMcComparison::SetData (const string& filename)
 {
-    th1service.AddPlotFromFile("hData", plotName_, fileName);
-    th1service.GetPlot("hData")-> ConvertToPointPlot(kBlack,20,0.8);
-    legend->AddEntry( th1service.GetPlot("hData")->GetObject(), "data", "PL" );
-    isData_ = true;
+    _th1service.AddPlotFromFile("hData", _plotname, filename);
+    _th1service.GetPlot("hData")->ConvertToPointPlot(kBlack, 20, 0.8);
+    _legend->AddEntry(_th1service.GetPlot("hData")->GetSnapShot(), "data", "PL");
+    _isdata = true;
 }
 
-void DataMcComparison::SetSignal(string fileName, string SigName, Color_t color, Style_t style, double shift_factor)
+void DataMcComparison::SetSignal (const string& filename, const string& signame, Color_t color, Style_t style, double shift_factor, bool showfactor)
 {
-    th1service.AddPlotFromFile( SigName, plotName_, fileName );
-    //th1service.GetPlot( SigName )-> SetScaleWeight( shift_factor );
-    th1service.GetPlot( SigName )-> SetScaleWeight( shift_factor*Lumi_ );
-    th1service.GetPlot( SigName )-> ConvertToLinePlot( color, style );
-    if ( shift_factor<5 ) legend->AddEntry( th1service.GetPlot( SigName )->GetObject(), SigName.c_str(), "L" );
-    else legend->AddEntry( th1service.GetPlot( SigName )->GetObject(), Form("%s x%.0f",SigName.c_str(),shift_factor ), "L" );
-    signalCollection_.emplace_back( th1service.GetPlot( SigName ) );
-    isSignal_ = true;
+    _th1service.AddPlotFromFile(signame, _plotname, filename);
+    _th1service.GetPlot(signame)->SetScaleWeight(shift_factor * _lumi);
+    _th1service.GetPlot(signame)->ConvertToLinePlot(color, style);
+    string legstr = showfactor ? (signame + " x " + to_string(shift_factor)) : signame;
+    _legend->AddEntry(_th1service.GetPlot(signame)->GetSnapShot(), legstr.c_str(), "L");
+    _signalcollection.emplace_back(_th1service.GetPlot(signame));
+    _issignal = true;
 
-    cout << SigName << " : " << th1service.GetPlot( SigName )->GetEventN() << endl;
+    cout << signame << " (expected) : " << _th1service.GetPlot(signame)->GetEventN() / shift_factor << endl;
 }
 
-void DataMcComparison::SetBkgComp(vector<string> fileNames, string BkgName, Color_t color ,Style_t style, double scale_weight)
+void DataMcComparison::SetBkgComp (const vector<string>& filenames, const string& bkgname, Color_t color ,Style_t style, double scale_factor, bool showfactor)
 {
-    scale_weight_ = scale_weight; 
-    bool flag = false;
-    int i = 0;
-    for ( const auto& it : fileNames ) {
-        if (flag) {
-            th1service.AddPlotFromFile( BkgName + to_string(i), plotName_, it );
-            th1service.GetPlot( BkgName )->AddPlot( th1service.GetPlot( BkgName + to_string(i) ) ->GetObject() );
-            th1service.AddPlotFromFile( BkgName+"tmp" + to_string(i), plotName_, it );
-            backgroundCollection_.emplace_back( th1service.GetPlot(BkgName+"tmp" +to_string(i)) );
-            i++;
+    bool ismulti = false;
+    int count = 0;
+    for (const auto& it : filenames) {
+        if (ismulti) {
+            _th1service.AddPlotFromFile(bkgname + to_string(count), _plotname, it);
+            _th1service.GetPlot(bkgname)->AddPlot(_th1service.GetPlot(bkgname + to_string(count))->GetSnapShot());
         } else {
-            th1service.AddPlotFromFile( BkgName, plotName_, it ); flag = true; i++;
-            th1service.AddPlotFromFile( BkgName + "tmp", plotName_, it );
-            backgroundCollection_.emplace_back( th1service.GetPlot(BkgName+"tmp") );
+            _th1service.AddPlotFromFile(bkgname, _plotname, it);
+            ismulti = true;
         }
+        count++;
     }
-    //th1service.GetPlot( BkgName )->SetScaleWeight( scale_weight );
-    th1service.GetPlot( BkgName )->SetScaleWeight( scale_weight*Lumi_ );
-    th1service.GetPlot( BkgName )->ConvertToFillPlot( color, style );
-    stackPlot_->Add( th1service.GetPlot(BkgName)->GetObject() );
-    legend -> AddEntry( th1service.GetPlot(BkgName)->GetObject(), BkgName.c_str(), "F");
-    isBkg_ = true;
+    _th1service.GetPlot(bkgname)->SetScaleWeight(scale_factor * _lumi);
+    _backgroundcollection.emplace_back(_th1service.GetPlot(bkgname)->GetSnapShot());
+    _th1service.GetPlot(bkgname)->ConvertToFillPlot(color, style);
+    _stackplot->Add(_th1service.GetPlot(bkgname)->GetSnapShot());
+    string legstr = showfactor ? (bkgname + " x " + to_string(scale_factor)) : bkgname;
+    _legend->AddEntry(_th1service.GetPlot(bkgname)->GetSnapShot(), legstr.c_str(), "F");
+    _isbkg = true;
 }
 
-void DataMcComparison::SetLogScale(bool isLog)
+void DataMcComparison::SetLogScale (bool islog)
 {
-    isLog_ = isLog;
+    _islog = islog;
 }
 
-void DataMcComparison::DrawDriven(string xtitle)
+void DataMcComparison::DrawDriven (const string& xtitle, const string& unit)
 {
-    assert( isBkg_ && isData_ );
+    assert(_isbkg && _isdata);
 
-    auto XRange = th1service.GetPlot("hData")->GetXRange();
-    nbin_ = th1service.GetPlot("hData")->GetNbinsX();
-    th1service.AddNewTH1("hBkg", nbin_, XRange.first, XRange.second);
-    for (const auto& it : backgroundCollection_) {
-        th1service.GetPlot("hBkg")->AddPlot(it->GetObject()); 
+    auto xrange = _th1service.GetPlot("hData")->GetXRange();
+    _nbin = _th1service.GetPlot("hData")->GetNbinsX();
+    _th1service.AddNewTH1("hBkg", _nbin, xrange.first, xrange.second);
+    for (const auto& it : _backgroundcollection) {
+        _th1service.GetPlot("hBkg")->AddPlot(it); 
     }
-    //th1service.GetPlot("hBkg")->SetScaleWeight(scale_weight_);
-    th1service.GetPlot("hBkg")->SetScaleWeight(scale_weight_*Lumi_);
 
-    ARTKIT::SetGlobalStyle();
-// Add MC Uncertainties (Stat , Syst)    
-//________________________________________________________________________________________________________________
-    GetTotalMCError(doSysts_);
-    th1service.AddNewTH1("ErrorPlot",nbin_,XRange.first,XRange.second);
-    th1service.AddNewTH1("ErrorPlotr",nbin_,XRange.first,XRange.second);
-    th1service.GetPlot("ErrorPlot")->SetBinContent(TotalContent_);
-    th1service.GetPlot("ErrorPlotr")->SetBinContent(TotalrContent_);
-    th1service.GetPlot("ErrorPlot")->ConvertToBoxErrorPlot(kGray+2,0.55);
-    th1service.GetPlot("ErrorPlotr")->ConvertToBoxErrorPlot(kGray+2,0.55);
-    if(doSysts_)legend -> AddEntry(th1service.GetPlot("ErrorPlot")->GetObject(),"Stat. #oplus Syst.","F");
-    else legend -> AddEntry(th1service.GetPlot("ErrorPlot")->GetObject(),"Stat. Uncert.","F");
-//_________________________________________________________________________________________________________________
-//
-    canv_ = ARTKIT::signalCanvas(); canv_->cd();
+    plotmgr::SetGlobalStyle();
 
-    //Top Plot
-    TPad* topPad = ARTKIT::TopPad(); topPad->Draw(); topPad->cd();
-    stackPlot_->Draw("histo");
-    th1service.GetPlot("ErrorPlot")->Draw("E2 same");
-    if ( isSignal_ ) 
-        for ( const auto& it : signalCollection_ ) it -> Draw("histosame");
-    th1service.GetPlot("hData")->Draw("E1 X0 same");
+    // Add MC Uncertainties (Stat , Syst)    
+    //------------------------------------------------------------------------------------------------------------------
+    GetTotalMCError(_dosysts);
+    _th1service.AddNewTH1("ErrorPlot", _nbin, xrange.first, xrange.second);
+    _th1service.AddNewTH1("ErrorPlotr", _nbin, xrange.first, xrange.second);
+    _th1service.GetPlot("ErrorPlot")->SetBinContent(_totalcontent);
+    _th1service.GetPlot("ErrorPlot")->ConvertToBoxErrorPlot(kGray+2, 0.55);
+    _th1service.GetPlot("ErrorPlotr")->SetBinContent(_totalrcontent);
+    _th1service.GetPlot("ErrorPlotr")->ConvertToBoxErrorPlot(kGray+2, 0.55);
+    string legstr = _dosysts ? "Stat. #oplus Syst." : "Stat. Uncert.";
+    _legend->AddEntry(_th1service.GetPlot("ErrorPlot")->GetSnapShot(), legstr.c_str(), "F");
+    //------------------------------------------------------------------------------------------------------------------
 
-    stackPlot_ -> GetXaxis()->SetLabelSize(0.);
-    stackPlot_ -> GetYaxis()->SetTitle(Form("Events/(%.2f)",stackPlot_->GetXaxis()->GetBinWidth(1)));
-    stackPlot_ -> GetHistogram() -> SetTitleFont(42,"xyz");
-    stackPlot_ -> GetHistogram() -> SetLabelFont(42,"xyz");
-    stackPlot_ -> GetHistogram() -> SetLabelSize(0.04,"xyz");
-    stackPlot_ -> GetHistogram() -> SetTitleSize(0.04,"xyz");
+    //Cancas
+    _canv = plotmgr::NewCanvas(); _canv->cd();
 
-    if ( isLog_ ) {
-       topPad->SetLogy();
-       stackPlot_ -> SetMinimum(0.01);
-       stackPlot_ -> SetMaximum( 800 * th1service.GetPlot("hData")->GetMaxContent() );
-    }else {
-       stackPlot_ -> SetMinimum(0.);
-       stackPlot_ -> SetMaximum( 1.6 * th1service.GetPlot("hData")->GetMaxContent() );
+    //Top Pad
+    //------------------------------------------------------------------------------------------------------------------
+    TPad* toppad = plotmgr::NewTopPad(); toppad->Draw(); toppad->cd();
+    _stackplot->Draw("histo");
+    _th1service.GetPlot("ErrorPlot")->Draw("E2 same");
+    if (_issignal) 
+        for (const auto& it : _signalcollection) it->Draw("histosame");
+    _th1service.GetPlot("hData")->Draw("E1 X0 same");
+
+    _stackplot->GetXaxis()->SetLabelSize(0.);
+    _stackplot->GetYaxis()->SetTitle(Form("Events/(%.2f %s)", _stackplot->GetXaxis()->GetBinWidth(1), unit.c_str()));
+    _stackplot->GetHistogram()->SetTitleFont(42,"xyz");
+    _stackplot->GetHistogram()->SetLabelFont(42,"xyz");
+    _stackplot->GetHistogram()->SetLabelSize(0.04,"xyz");
+    _stackplot->GetHistogram()->SetTitleSize(0.04,"xyz");
+
+    if (_islog) {
+       toppad->SetLogy();
+       _stackplot->SetMinimum(0.01);
+       _stackplot->SetMaximum(800 * _th1service.GetPlot("hData")->GetMaxContent());
+    } else {
+       _stackplot->SetMinimum(0.);
+       _stackplot->SetMaximum(1.6 * _th1service.GetPlot("hData")->GetMaxContent());
     }
     
-    legend->Draw();
-    AddLatexContent(Lumi_, type_);
+    _legend->Draw();
+    AddLatexContent(_lumi, _type);
+    //------------------------------------------------------------------------------------------------------------------
 
-    canv_->Update();
-    
+    _canv->Update();
+
     //Bottom Plot
-    canv_->cd();
-    TPad* bottomPad = ARTKIT::BottomPad(); bottomPad->Draw(); bottomPad->cd();
-    TH1D* comparePlot = ARTKIT::ratioPlot(th1service.GetPlot("hData")->GetObject(), 
-                                          th1service.GetPlot("hBkg")->GetObject(), 
-                                          Form("%s",xtitle.c_str()), "Data/MC" );
+    //------------------------------------------------------------------------------------------------------------------
+    _canv->cd();
+    TPad* bottomPad = plotmgr::NewBottomPad(); bottomPad->Draw(); bottomPad->cd();
+    TH1D* comparePlot = plotmgr::RatioPlot(_th1service.GetPlot("hData")->GetSnapShot(), 
+                                          _th1service.GetPlot("hBkg")->GetSnapShot(), 
+                                          Form("%s",xtitle.c_str()), "Data/MC");
     comparePlot -> Draw("E1 X0");
-    th1service.GetPlot("ErrorPlotr")->Draw("E2 same");
-    TLine* horizonline =  ARTKIT::horizontalLine( comparePlot,1,kBlue,7,3 );
+    _th1service.GetPlot("ErrorPlotr")->Draw("E2 same");
+    TLine* horizonline =  plotmgr::NewHorizontalLine(comparePlot, 1, kBlue, 7, 3);
     horizonline -> Draw();
     comparePlot -> Draw("E1 X0 same");
-    
-    canv_->Update();
+    //------------------------------------------------------------------------------------------------------------------
+
+    _canv->Update();
     end();
 }
 
 
-void DataMcComparison::end()
+void DataMcComparison::end ()
 {
-    system(Form("mkdir -p %s",outDir_.c_str()));
-    canv_->Print(Form("%s/%s.pdf",outDir_.c_str(),plotName_.c_str()));
-    canv_->Close();
+    system(Form("mkdir -p %s",_outdir.c_str()));
+    _canv->Print(Form("%s/%s.pdf",_outdir.c_str(),_plotname.c_str()));
+    _canv->Close();
 }
 
-void DataMcComparison::SetLumi( double Lumi )
+void DataMcComparison::SetLumi (double Lumi)
 {
-    Lumi_ = Lumi;
+    _lumi = Lumi;
 }
 
-void DataMcComparison::SetSystError( PairVector SystError, bool doSysts )
+void DataMcComparison::SetSystError (const PairVector& systerror, bool dosysts)
 {
-    SystError_ = SystError;
-    doSysts_ = doSysts;
+    _systerror = systerror;
+    _dosysts = dosysts;
 }
 
-void DataMcComparison::GetTotalMCError(bool AddSysts)
+void DataMcComparison::GetTotalMCError (bool addsysts)
 {
-    auto BkgContent = th1service.GetPlot("hBkg")->GetBinContent();
+    auto bkgcontent = _th1service.GetPlot("hBkg")->GetBinContent();
 
-    for ( int i=0; i<nbin_; i++ ) {
-        if (BkgContent[i].first == 0.) {
-            TotalContent_.emplace_back( make_pair(0.,0.) );
-            TotalrContent_.emplace_back( make_pair(0.,0.) );
-        } else if ( AddSysts ) {
-            double totalUp = sqrt( pow(BkgContent[i].second,2.0) + pow(SystError_[i].first,2.0) );
-            double totalDown = sqrt( pow(BkgContent[i].second,2.0) + pow(SystError_[i].second,2.0) );
-            double UpValue = totalUp + BkgContent[i].first;
-            double DownValue =  BkgContent[i].first - totalDown;
-            TotalContent_ .emplace_back( make_pair( (UpValue+DownValue)/2., (UpValue-DownValue)/2. ) );
-            TotalrContent_.emplace_back( make_pair( (UpValue+DownValue)/(2.*BkgContent[i].first), (UpValue-DownValue)/(2.*BkgContent[i].first) ) );
+    for (int i = 0; i < _nbin; i++) {
+        if (bkgcontent[i].first == 0.) {
+            _totalcontent.emplace_back(make_pair(0.,0.));
+            _totalrcontent.emplace_back(make_pair(0.,0.));
+        } else if (addsysts) {
+            double totalup = sqrt(pow(bkgcontent[i].second, 2.0) + pow(_systerror[i].first, 2.0));
+            double totaldown = sqrt(pow(bkgcontent[i].second, 2.0) + pow(_systerror[i].second, 2.0));
+            double upvalue = totalup + bkgcontent[i].first;
+            double downvalue =  bkgcontent[i].first - totaldown;
+            _totalcontent .emplace_back(make_pair((upvalue + downvalue) / 2., (upvalue - downvalue) / 2.));
+            _totalrcontent.emplace_back(make_pair((upvalue + downvalue) / (2. * bkgcontent[i].first), (upvalue - downvalue) / (2. * bkgcontent[i].first)));
         } else {
-            TotalContent_ .emplace_back( make_pair( BkgContent[i].first, BkgContent[i].second ) );
-            TotalrContent_.emplace_back( make_pair( 1., BkgContent[i].second/BkgContent[i].first) );
+            _totalcontent .emplace_back(make_pair(bkgcontent[i].first, bkgcontent[i].second));
+            _totalrcontent.emplace_back(make_pair(1., bkgcontent[i].second / bkgcontent[i].first));
         }
     }//i++
 }

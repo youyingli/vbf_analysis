@@ -1,13 +1,11 @@
 #include "vbf_analysis/DataMcComparison/interface/LatexDraw.h"
-#include "vbf_analysis/Utils/interface/PlotLibrary.h"
-
-#include "TLatex.h"
+#include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
 using namespace std;
 
-void AddLatexContent(double lumi, string type) 
+void AddLatexContent(double lumi, const string& type) 
 {
-    ARTKIT::SetCMSandLUMI(lumi);
+    plotmgr::SetCMSandLUMI(lumi);
 
     if (type == "") {
         TLatex lex;

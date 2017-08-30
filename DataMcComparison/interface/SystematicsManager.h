@@ -1,7 +1,7 @@
 #ifndef __SYSTEMATICSMANAGER__
 #define __SYSTEMATICSMANAGER__
 
-#include "vbf_analysis/Utils/interface/TH1Service.hpp"
+#include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
 #include <string>
 #include <vector>
@@ -12,19 +12,19 @@ class SystematicsManager{
     typedef std::vector<std::pair<double,double>> PairVector;
 
     public:
-        SystematicsManager( std::string plotname );
+        SystematicsManager(const std::string& plotname);
         ~SystematicsManager();
-        void SetMcCollection( std::vector<std::string> Collection );
-        void AddSystLabel(std::string SystLabel);
+        void SetMcCollection(std::vector<std::string> collection);
+        void AddSystLabel(const std::string& systlabel);
         void ErrorPropagator(double scale);
         
-        PairVector GetSystError(){ return SystError; }
+        PairVector GetSystError() const {return _systerror;}
 
     private:
-        std::string plotname_;
-        std::vector<std::string> Collection_;
-        std::vector<std::string> SystLabels_;
-        PairVector SystError;
+        std::string _plotname;
+        std::vector<std::string> _collection;
+        std::vector<std::string> _systlabels;
+        PairVector _systerror;
 
 };
 
