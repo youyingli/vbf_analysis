@@ -9,20 +9,20 @@
 class ZPlusJetsValidSelector{
 
     public:
-        ZPlusJetsValidSelector(std::string indir, std::string infilename, std::string sampleName, std::string outdir);
+        ZPlusJetsValidSelector(const std::string& indir, const std::string& infilename, const std::string& samplename, const std::string& outdir);
         ~ZPlusJetsValidSelector();
-        void SelectLoop(std::string state = "");
-        void SetSystLabel(std::string SystLabel = "");
+        void SelectLoop(const std::string& state = "");
+        void SetSystLabel(const std::string& systlabel = "");
 
     private:
 
-        TFile* infile_;
-        TTree* inTree_;
-        std::string indir_;
-        std::string infilename_;
-        std::string sampleName_;
-        std::string SystLabel_;
-        std::string outdir_;
+        TFile* _infile;
+        TTree* _intree;
+        std::string _indir;
+        std::string _infilename;
+        std::string _samplename;
+        std::string _systlabel;
+        std::string _outdir;
 
         void Initialization();
         Float_t dipho_mass              ; 

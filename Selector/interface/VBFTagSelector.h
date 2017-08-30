@@ -6,28 +6,28 @@
 #include "TFile.h"
 #include "TTree.h"
 
-class VBFTagSelector{
+class VBFTagSelector {
 
     public:
-        VBFTagSelector(std::string indir, std::string infilename, std::string sampleName, std::string outdir);
-        ~VBFTagSelector();
-        void SetSignalRegion(double min, double max);
-        void selectLoop(bool isSideBand = true);
-        void SetSystLabel(std::string SystLabel = "");
+        VBFTagSelector (const std::string& indir, const std::string& infilename, const std::string& samplename, const std::string& outdir);
+        ~VBFTagSelector ();
+        void SetSignalRegion (double min, double max);
+        void selectLoop (bool onlysideband = true);
+        void SetSystLabel (const std::string& systlabel = "");
 
     private:
 
-        TFile* infile_;
-        TTree* inTree_;
-        std::string indir_;
-        std::string infilename_;
-        std::string sampleName_;
-        std::string SystLabel_;
-        std::string outdir_;
-        double min_;
-        double max_;
+        TFile* _infile;
+        TTree* _intree;
+        std::string _indir;
+        std::string _infilename;
+        std::string _samplename;
+        std::string _systlabel;
+        std::string _outdir;
+        double _min;
+        double _max;
 
-        void Initialization();
+        //Format
         Float_t dipho_mass              ; 
         Float_t dipho_leadPt            ; 
         Float_t dipho_leadEta           ; 
@@ -72,19 +72,24 @@ class VBFTagSelector{
         Float_t jet3_mass               ; 
 
         //outTree
-        Float_t dijet_LeadJPt_           ;
-        Float_t dijet_SubJPt_            ;
-        Float_t dijet_abs_dEta_          ;
-        Float_t dijet_Mjj_               ;
-        Float_t dijet_centrality_gg_     ;
-        Float_t dijet_dipho_dphi_trunc_  ;
-        Float_t dijet_dphi_              ;
-        Float_t dijet_minDRJetPho_       ;
-        Float_t dipho_lead_ptoM_         ;
-        Float_t dipho_sublead_ptoM_      ;
-        Float_t dipho_mva_               ;
-        Float_t dipho_dijet_MVA_         ;
+        Float_t _dijet_LeadJPt           ;
+        Float_t _dijet_SubJPt            ;
+        Float_t _dijet_abs_dEta          ;
+        Float_t _dijet_Mjj               ;
+        Float_t _dijet_centrality_gg     ;
+        Float_t _dijet_dipho_dphi_trunc  ;
+        Float_t _dijet_dphi              ;
+        Float_t _dijet_minDRJetPho       ;
+        Float_t _dipho_lead_ptoM         ;
+        Float_t _dipho_sublead_ptoM      ;
+        Float_t _dipho_mva               ;
+        Float_t _dipho_dijet_MVA         ;
+        Float_t _dipho_mass              ;
+        Float_t _dijet_BDT               ;
+        Float_t _weight                  ;
 
+        //private fuction
+        void Initialization();
 
 };
 
