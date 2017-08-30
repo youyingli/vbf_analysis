@@ -37,7 +37,6 @@ namespace plotmgr
             void SetBinContent (const std::vector<std::pair<double,double>>& contentset);
             void NormalizeToOne ();
     
-            T* GetSnapShot () const {return (T*)_plot->Clone();}
             double GetWeightEventN (double min, double max) const;
             double GetEventN () const {return _plot->Integral();}
             double GetBinWidth () const {return _plot->GetXaxis()->GetBinWidth(1);}
@@ -45,8 +44,11 @@ namespace plotmgr
             double GetMaxContent () const {return _plot -> GetMaximum();}
             std::vector<std::pair<double,double>> GetBinContent () const;
             std::pair<double,double> GetXRange () const {return std::make_pair(_plot->GetXaxis()->GetXmin(), _plot->GetXaxis()->GetXmax());}
+            T* GetSnapShot ();
+
         private:
             T* _plot;
+            std::vector<T*> _snapshotbuffer;
     
             //private function
             void SetCommonAxis();

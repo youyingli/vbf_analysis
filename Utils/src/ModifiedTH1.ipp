@@ -24,6 +24,8 @@ template <typename T>
 ModifiedTH1<T>::~ModifiedTH1 ()
 {
     delete _plot;
+    if (_snapshotbuffer.size() != 0)
+        for (const auto& it : _snapshotbuffer) it->Delete();
 }
 
 //copy constructor
@@ -191,5 +193,12 @@ void ModifiedTH1<T>::SetCommonAxis ()
     _plot->GetYaxis()->SetTitleOffset(1.2);
 }
 
+template <typename T>
+T* ModifiedTH1<T>::GetSnapShot ()
+{
+    T* snapshot = (T*)_plot->Clone();
+    _snapshotbuffer.emplace_back(snapshot);
+    return snapshot;
+}
 
 #endif
