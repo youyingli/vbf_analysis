@@ -1,12 +1,13 @@
 #ifndef __SCALEFACTORCALCULATOR__
 #define __SCALEFACTORCALCULATOR__
 
-#include <vector>
-#include <utility>
-
-#include "TH1D.h"
 #include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
+#include "TH1F.h"
+
+#include <string>
+#include <vector>
+#include <utility>
 
 class ScaleFactorCalculator{
 
@@ -24,7 +25,7 @@ class ScaleFactorCalculator{
     private:
         double _weight;
         std::string _controlplot;
-        plotmgr::TH1Service<TH1D> _th1service;
+        plotmgr::TH1Service<TH1F> _th1service;
         std::vector<std::pair<double,double>> _RemoveRange;
         std::pair<double,double> _KeepRange;
 

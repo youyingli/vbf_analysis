@@ -4,6 +4,7 @@
 //Basic ROOT Plot header file
 #include "TCanvas.h"
 #include "TPad.h"
+#include "TH1F.h"
 #include "TH1D.h"
 #include "THStack.h"
 #include "TLatex.h"

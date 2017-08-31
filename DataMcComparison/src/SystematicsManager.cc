@@ -28,7 +28,7 @@ void SystematicsManager::AddSystLabel(const string& systlabel)
 
 void SystematicsManager::ErrorPropagator(double scale)
 {
-    TH1Service<TH1D> th1service;
+    TH1Service<TH1F> th1service;
     th1service.AddPlotFromFile("htest", _plotname, _collection[0] + ".root");
     const int nbin = th1service.GetPlot("htest")->GetNbinsX();
     unique_ptr<double[]> uperror2(new double[nbin]);

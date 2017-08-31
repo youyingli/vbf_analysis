@@ -1,13 +1,13 @@
 #ifndef __MODIFIEDTH1_HPP__
 #define __MODIFIEDTH1_HPP__
 
-#include <string>
-#include <vector>
-#include <utility>
-
 #include "TH1.h"
 #include "TH1F.h"
 #include "TH1D.h"
+
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace plotmgr 
 {

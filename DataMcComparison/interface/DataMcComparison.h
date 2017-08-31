@@ -3,6 +3,10 @@
 
 #include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
+#include <string>
+#include <vector>
+#include <utility>
+
 class DataMcComparison{
 
     typedef std::vector<std::pair<double,double>> PairVector;
@@ -21,7 +25,7 @@ class DataMcComparison{
 
 
     private:
-        plotmgr::TH1Service<TH1D> _th1service;
+        plotmgr::TH1Service<TH1F> _th1service;
 
         bool _issignal;
         bool _isbkg;
@@ -36,8 +40,8 @@ class DataMcComparison{
         TCanvas* _canv;
         THStack* _stackplot;
         TLegend* _legend;
-        std::vector<ModifiedTH1<TH1D>*> _signalcollection;
-        std::vector<TH1D*> _backgroundcollection;
+        std::vector<ModifiedTH1<TH1F>*> _signalcollection;
+        std::vector<TH1F*> _backgroundcollection;
         PairVector _systerror;
         PairVector _totalcontent;
         PairVector _totalrcontent;

@@ -1,5 +1,7 @@
 #include "vbf_analysis/Utils/interface/SetCMSMark.h"
 
+#include "TLatex.h"
+
 namespace plotmgr
 {
 

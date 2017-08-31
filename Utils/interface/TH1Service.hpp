@@ -1,8 +1,9 @@
 #ifndef __TH1SERVICE_HPP__
 #define __TH1SERVICE_HPP__
 
-#include "TFile.h"
 #include "vbf_analysis/Utils/interface/ModifiedTH1.hpp"
+
+#include "TFile.h"
 
 #include <string>
 #include <map>

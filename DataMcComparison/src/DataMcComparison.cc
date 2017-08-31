@@ -1,8 +1,10 @@
-#include <cassert>
-#include <iostream>
-#include "TFile.h"
 #include "vbf_analysis/DataMcComparison/interface/DataMcComparison.h"
 #include "vbf_analysis/DataMcComparison/interface/LatexDraw.h"
+
+#include "TFile.h"
+
+#include <iostream>
+#include <cassert>
 
 using namespace std;
 
@@ -141,7 +143,7 @@ void DataMcComparison::DrawDriven (const string& xtitle, const string& unit)
     //------------------------------------------------------------------------------------------------------------------
     _canv->cd();
     TPad* bottomPad = plotmgr::NewBottomPad(); bottomPad->Draw(); bottomPad->cd();
-    TH1D* comparePlot = plotmgr::RatioPlot(_th1service.GetPlot("hData")->GetSnapShot(), 
+    TH1F* comparePlot = plotmgr::RatioPlot(_th1service.GetPlot("hData")->GetSnapShot(), 
                                           _th1service.GetPlot("hBkg")->GetSnapShot(), 
                                           Form("%s",xtitle.c_str()), "Data/MC");
     comparePlot -> Draw("E1 X0");

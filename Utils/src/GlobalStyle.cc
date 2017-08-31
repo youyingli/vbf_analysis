@@ -1,5 +1,7 @@
 #include "vbf_analysis/Utils/interface/GlobalStyle.h"
 
+#include "TStyle.h"
+
 namespace plotmgr
 {
 
