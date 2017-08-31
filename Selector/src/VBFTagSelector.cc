@@ -1,12 +1,16 @@
-#include <iostream>
-
 #include "TH1F.h"
 #include "TLorentzVector.h"
+
+#include "RooRealVar.h"
+#include "RooDataSet.h"
+#include "RooArgSet.h"
+#include "RooWorkspace.h"
 
 #include "vbf_analysis/Selector/interface/VBFTagSelector.h"
 #include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
 
+#include <iostream>
 using namespace std;
 
 VBFTagSelector::VBFTagSelector (const string& indir, const string& infilename, const string& samplename, const string& outdir):
@@ -102,10 +106,15 @@ void VBFTagSelector::selectLoop (bool onlysideband)
     outTree_MVA->Branch("dipho_mva"              ,&_dipho_mva                ,"dipho_mva/F"               );
     outTree_MVA->Branch("dipho_dijet_MVA"        ,&_dipho_dijet_MVA          ,"dipho_dijet_MVA/F"         );
 
-    TTree* outTree_fit = new TTree("fit_variables",""); 
-    outTree_fit->Branch("dipho_mass"             ,&_dipho_mass               ,"dipho_mass/F"              );
-    outTree_fit->Branch("dijet_BDT"              ,&_dijet_BDT                ,"dijet_BDT/F"               );
-    outTree_fit->Branch("weight"                 ,&_weight                   ,"weight/F"                  );
+    //Producr workspace for roofit
+    RooWorkspace* ws = new RooWorkspace("ws");
+    RooRealVar CMS_hgg_mass("CMS_hgg_mass", "CMS_hgg_mass", 100., 180.);
+    RooRealVar Dijet_BDT("Dijet_BDT", "Dijet_BDT", 0.2, 1.0);
+    RooRealVar Weight("weight", "weight", -10000., 10000.);
+    RooDataSet dataset("dataset", "dataset", RooArgSet(CMS_hgg_mass, Dijet_BDT, Weight));
+    ws->import(CMS_hgg_mass);
+    ws->import(Dijet_BDT);
+    ws->import(Weight);
 
     //Produce plots
     plotmgr::TH1Service<TH1F> th1service;
@@ -182,10 +191,12 @@ void VBFTagSelector::selectLoop (bool onlysideband)
         _dipho_mva               =  dipho_mva               ;
         _dipho_dijet_MVA         =  dipho_dijet_MVA         ;             
         outTree_MVA->Fill();
-        _dipho_mass              =  dipho_mass              ;
-        _dijet_BDT               =  dijet_mva               ;
-        _weight                  =  weight                  ;
-        outTree_fit->Fill();
+
+        //Fill values into dataset
+        CMS_hgg_mass.setVal(dipho_mass);
+        Dijet_BDT.setVal(dijet_mva);
+        Weight.setVal(weight);
+        dataset.add(RooArgSet(CMS_hgg_mass, Dijet_BDT, Weight));
 
         bool isSig = (_samplename.find("h_") != string::npos) || (_samplename.find("vbf_") != string::npos);
         if (!isSig && onlysideband)
@@ -221,6 +232,8 @@ void VBFTagSelector::selectLoop (bool onlysideband)
         th1service.GetPlot("h1_dipho_dijet_dPt"          )->FillEvent(dipho_dijet_dPt          ,weight); 
 
     }//entry++
+    ws->import(dataset);
+    ws->Write();
     outfile->Write();
 
     cout << "[INFO]: Dumping of " << _infilename << ".root is finished !!!" << endl;

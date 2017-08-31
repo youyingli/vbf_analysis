@@ -84,9 +84,6 @@ class VBFTagSelector {
         Float_t _dipho_sublead_ptoM      ;
         Float_t _dipho_mva               ;
         Float_t _dipho_dijet_MVA         ;
-        Float_t _dipho_mass              ;
-        Float_t _dijet_BDT               ;
-        Float_t _weight                  ;
 
         //private fuction
         void Initialization();
