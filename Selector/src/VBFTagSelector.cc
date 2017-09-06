@@ -111,7 +111,7 @@ void VBFTagSelector::selectLoop (bool onlysideband)
     RooRealVar CMS_hgg_mass("CMS_hgg_mass", "CMS_hgg_mass", 100., 180.);
     RooRealVar Dijet_BDT("Dijet_BDT", "Dijet_BDT", 0.2, 1.0);
     RooRealVar Weight("weight", "weight", -10000., 10000.);
-    RooDataSet dataset("dataset", "dataset", RooArgSet(CMS_hgg_mass, Dijet_BDT, Weight));
+    RooDataSet dataset("dataset", "dataset", RooArgSet(CMS_hgg_mass, Dijet_BDT, Weight), RooFit::WeightVar("weight"));
     ws->import(CMS_hgg_mass);
     ws->import(Dijet_BDT);
     ws->import(Weight);
@@ -153,9 +153,17 @@ void VBFTagSelector::selectLoop (bool onlysideband)
     for (int entry=0; entry < _intree->GetEntries(); entry++) {
         _intree->GetEntry(entry);
 
-        bool selections = (   dipho_lead_ptoM > (1./4) && dipho_sublead_ptoM > (1./5)
-                           && dijet_LeadJPt > 30.      && dijet_SubJPt > 20.       
-                           && dijet_Mjj > 600.         &&(dipho_mass > 100. && dipho_mass < 180.)
+//        bool selections = (   dipho_lead_ptoM > (1./4) && dipho_sublead_ptoM > (1./5)
+//                           && dijet_LeadJPt > 30.      && dijet_SubJPt > 20.       
+//                           && dijet_Mjj > 600.         &&(dipho_mass > 100. && dipho_mass < 180.)
+//                          );
+
+        bool selections = (   dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
+                           && dipho_leadIDMVA>0.     && dipho_subleadIDMVA>0.
+                           && dijet_LeadJPt>30.      && dijet_SubJPt>20.
+                           && fabs(dijet_leadEta)<4.7&& fabs(dijet_subleadEta)<4.7
+                           && dijet_Mjj> 150.        && dijet_abs_dEta>2.
+                           && dijet_mva>0.2          && (dipho_mass>100. && dipho_mass<180.)
                           );
 
         if ( !selections ) continue;
@@ -196,7 +204,7 @@ void VBFTagSelector::selectLoop (bool onlysideband)
         CMS_hgg_mass.setVal(dipho_mass);
         Dijet_BDT.setVal(dijet_mva);
         Weight.setVal(weight);
-        dataset.add(RooArgSet(CMS_hgg_mass, Dijet_BDT, Weight));
+        dataset.add(RooArgSet(CMS_hgg_mass, Dijet_BDT, Weight), Weight.getVal());
 
         bool isSig = (_samplename.find("h_") != string::npos) || (_samplename.find("vbf_") != string::npos);
         if (!isSig && onlysideband)
