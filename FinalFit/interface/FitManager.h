@@ -30,7 +30,8 @@ class FitManager {
         double GetChi2OverDof () const;
         double GetMinNLL () const { return _fitres->minNll(); }
         void ShowParamsInfo ();
-        RooAbsPdf* GetPostPdf () { return _pdf; };
+        RooAbsPdf* GetPostPdf () const { return _pdf; };
+        RooAbsData* GetData () const { return _isbinnedfit? (RooAbsData*)_dhist : (RooAbsData*)_dset; };
 
     private:
 
@@ -44,6 +45,7 @@ class FitManager {
         RooFitResult* _fitres;
 
         //Binned Fit
+        bool _isbinnedfit;
         int _nbin;
         double _fitrange;
         double _fullrange;

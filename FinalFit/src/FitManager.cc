@@ -16,6 +16,7 @@ FitManager::FitManager (const RooArgSet& varset, RooAbsPdf* pdf):
     string varstr = _params->contentsString();
     boost::split(_varstrs, varstr, boost::is_any_of(","));
     _dhist = nullptr;
+    _isbinnedfit = false;
 }
 
 FitManager::~FitManager ()
@@ -32,8 +33,10 @@ void FitManager::SetDataSetFitted (RooDataSet* dataset, bool isbinned, int nbin)
         var->setBins(nbin);
         _nbin = nbin;
         _dhist = new RooDataHist("dhist", "", RooArgSet(*var), *dataset);
+        _isbinnedfit = true;
     } else {
         _dset = dataset;
+        _isbinnedfit = false;
     }
 }
 
@@ -41,6 +44,8 @@ void FitManager::ImportTH1 (TH1* histfitted)
 {
     delete _dhist;
     _dhist = new RooDataHist("dhist", "", RooArgList(*_varset), histfitted);
+    _nbin = histfitted->GetNbinsX();
+    _isbinnedfit = true;
 }
 
 void FitManager::UseUnBinnedFitting (double minvar, double maxvar)
