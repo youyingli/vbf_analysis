@@ -22,7 +22,7 @@ class BiasStudy{
         BiasStudy (RooArgSet vars, RooAbsPdf* TestPdf);
         ~BiasStudy ();
 
-        void GenerateFakeExpt (RooAbsPdf* templatePdf, int nexpt);
+        void GenerateFakeExpt (RooAbsPdf* templatePdf, int neventsperexpt = 0, int nexpt = 1000);
         void TestManager (const RooArgList& tmpParams);
         RooPlot* GetPullDistribution (const RooAbsReal& testParam, int nbin);
         

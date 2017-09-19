@@ -26,16 +26,15 @@ BiasStudy::~BiasStudy()
     delete pullresult_;
 }
 
-void BiasStudy::GenerateFakeExpt (RooAbsPdf* templatePdf, int nexpt)
+void BiasStudy::GenerateFakeExpt (RooAbsPdf* templatePdf, int neventsperexpt, int nexpt)
 {
     TDatime t;
     unsigned int seed = t.GetDate() + t.GetTime();
     RooRandom::randomGenerator()->SetSeed(seed);
 
-    int nEvent = templatePdf->expectedEvents(vars_);
     cout << "[INFO] : Producing " << nexpt << " fake experiments ..." << endl;
     for (int i = 0; i < nexpt; i++) {
-        int PoissonEvent =  RooRandom::randomGenerator()->Poisson(nEvent != 0 ? nEvent : 3000);
+        int PoissonEvent =  RooRandom::randomGenerator()->Poisson(neventsperexpt != 0 ? neventsperexpt : 3000);
         RooDataSet* fakedata = templatePdf->generate(vars_, PoissonEvent);
         fakedataset_.push_back(fakedata);
     }
