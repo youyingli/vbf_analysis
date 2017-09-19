@@ -53,7 +53,7 @@ namespace plotmgr
         return legend;
     }
     
-    TH1F* RatioPlot(TH1F* hNumerator, TH1F* hDenominator, const string& xTitle, const string& yTitle)
+    TH1* RatioPlot(TH1* hNumerator, TH1* hDenominator, const string& xTitle, const string& yTitle)
     {
         TH1F* hratioPlot = (TH1F*)hNumerator -> Clone();
         hratioPlot->GetXaxis()->SetTitleSize(0.11);
@@ -72,7 +72,7 @@ namespace plotmgr
         return hratioPlot;
     }
     
-    TLine* NewHorizontalLine(TH1F* plot, double y, Color_t color, Style_t style, Width_t width)
+    TLine* NewHorizontalLine(TH1* plot, double y, Color_t color, Style_t style, Width_t width)
     {
         TLine* line = new TLine(plot->GetBinLowEdge(1), y, plot->GetBinLowEdge(plot->GetNbinsX()+1), y);
         line->SetLineColor(color);

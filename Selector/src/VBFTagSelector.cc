@@ -153,9 +153,17 @@ void VBFTagSelector::selectLoop (bool onlysideband)
     for (int entry=0; entry < _intree->GetEntries(); entry++) {
         _intree->GetEntry(entry);
 
-        bool selections = (   dipho_lead_ptoM > (1./4) && dipho_sublead_ptoM > (1./5)
-                           && dijet_LeadJPt > 30.      && dijet_SubJPt > 20.       
-                           && dijet_Mjj > 200.         &&(dipho_mass > 100. && dipho_mass < 180.)
+//        bool selections = (   dipho_lead_ptoM > (1./4) && dipho_sublead_ptoM > (1./5)
+//                           && dijet_LeadJPt > 30.      && dijet_SubJPt > 20.       
+//                           && dijet_Mjj > 600.         &&(dipho_mass > 100. && dipho_mass < 180.)
+//                          );
+
+        bool selections = (   dipho_lead_ptoM>(1./3) && dipho_sublead_ptoM>(1./4)
+                           && dipho_leadIDMVA>0.     && dipho_subleadIDMVA>0.
+                           && dijet_LeadJPt>30.      && dijet_SubJPt>20.
+                           && fabs(dijet_leadEta)<4.7&& fabs(dijet_subleadEta)<4.7
+                           && dijet_Mjj> 150.        && dijet_abs_dEta>2.
+                           && dijet_mva>0.2          && (dipho_mass>100. && dipho_mass<180.)
                           );
 
         if ( !selections ) continue;

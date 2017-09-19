@@ -143,14 +143,14 @@ void DataMcComparison::DrawDriven (const string& xtitle, const string& unit)
     //------------------------------------------------------------------------------------------------------------------
     _canv->cd();
     TPad* bottomPad = plotmgr::NewBottomPad(); bottomPad->Draw(); bottomPad->cd();
-    TH1F* comparePlot = plotmgr::RatioPlot(_th1service.GetPlot("hData")->GetSnapShot(), 
+    TH1* comparePlot = plotmgr::RatioPlot(_th1service.GetPlot("hData")->GetSnapShot(), 
                                           _th1service.GetPlot("hBkg")->GetSnapShot(), 
                                           Form("%s",xtitle.c_str()), "Data/MC");
-    comparePlot -> Draw("E1 X0");
+    comparePlot->Draw("E1 X0");
     _th1service.GetPlot("ErrorPlotr")->Draw("E2 same");
     TLine* horizonline =  plotmgr::NewHorizontalLine(comparePlot, 1, kBlue, 7, 3);
-    horizonline -> Draw();
-    comparePlot -> Draw("E1 X0 same");
+    horizonline->Draw();
+    comparePlot->Draw("E1 X0 same");
     //------------------------------------------------------------------------------------------------------------------
 
     _canv->Update();

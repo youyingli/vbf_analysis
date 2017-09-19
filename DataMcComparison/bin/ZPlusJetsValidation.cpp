@@ -96,7 +96,7 @@ int main( int argc, char* argv[] ){
         comparePlot.SetSignal(Jet2Fake, "jet_{2} fake", kTeal+8, 1, scale_factor);
         comparePlot.SetSignal(BothFake, "both fake", kRed+1, 1, scale_factor);
         comparePlot.SetLogScale(isLogScale);
-        comparePlot.DrawDriven(XaxisName);
+        comparePlot.DrawDriven(XaxisName,"");
     }
 
 return 0;

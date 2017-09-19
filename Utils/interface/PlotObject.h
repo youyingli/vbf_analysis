@@ -3,7 +3,7 @@
 
 #include "TCanvas.h"
 #include "TPad.h"
-#include "TH1F.h"
+#include "TH1.h"
 #include "TLegend.h"
 #include "TLine.h"
 
@@ -16,8 +16,8 @@ namespace plotmgr
     extern TPad* NewBottomPad();
     extern TPad* NewNormalPad();
     extern TLegend* NewLegend();
-    extern TH1F* RatioPlot(TH1F* hNumerator, TH1F* hDenominator, const std::string& xTitle, const std::string& yTitle);
-    extern TLine* NewHorizontalLine(TH1F* plot, double y, Color_t color, Style_t style, Width_t width);
+    extern TH1* RatioPlot(TH1* hNumerator, TH1* hDenominator, const std::string& xTitle, const std::string& yTitle);
+    extern TLine* NewHorizontalLine(TH1* plot, double y, Color_t color, Style_t style, Width_t width);
 };
 
 #endif

@@ -50,8 +50,8 @@ int main( int argc, char* argv[] ) {
 
 //------------------------------------------------------------------------------------------------------------------
     //MC
-    ZPlusJetsValidSelector MCselector(indir, File, Name, outdir_);
-    for (const auto& it : jetstate) MCselector.SelectLoop(it);
+    //ZPlusJetsValidSelector MCselector(indir, File, Name, outdir_);
+    //for (const auto& it : jetstate) MCselector.SelectLoop(it);
     
     for (const auto& SystLabels_it : SystLabels) {
         ZPlusJetsValidSelector MCselectors(indir, File, Name, outdir_);

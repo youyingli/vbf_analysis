@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-inFilePath = '/wk_cms/youying/CMSSW_8_0_26_patch1/src/VBFTag/'
+inFilePath = '/wk_cms2/youying/myWork/CMSSW_9_2_8/src/VBF/'
 
 process = cms.PSet()
 
@@ -40,9 +40,6 @@ process.PlotInfo = cms.VPSet(
     cms.PSet( PlotName = cms.string('h1_dijet_mva'             ),  XaxisName = cms.string('dijet BDT'                       )    ), 
     cms.PSet( PlotName = cms.string('h1_dipho_dijet_mva'       ),  XaxisName = cms.string('combined MVA'                    )    ),                                 
     cms.PSet( PlotName = cms.string('h1_nvtx'                  ),  XaxisName = cms.string('Nvtx'                            )    ), 
-    cms.PSet( PlotName = cms.string('h1_dipho_dijet_dPt'       ),  XaxisName = cms.string('Pt_{jj or jjj}-Pt_{#gamma#gamma}')    ), 
-    cms.PSet( PlotName = cms.string('h1_dipho_massn'           ),  XaxisName = cms.string('M_{#gamma#gamma} (GeV)'          )    ), 
-    cms.PSet( PlotName = cms.string('h1_dipho_massp'           ),  XaxisName = cms.string('M_{#gamma#gamma} (GeV)'          )    )  
 
 )
 

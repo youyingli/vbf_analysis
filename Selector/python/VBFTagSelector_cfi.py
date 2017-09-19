@@ -5,7 +5,7 @@ process = cms.PSet()
 
 process.GlobalSet = cms.PSet(
 
-    indir = cms.string('/wk_cms2/youying/RunIISummer16-2_4_1-25ns_Moriond17/'),    
+    indir = cms.string('/wk_cms2/youying/latest/'),    
     isSideBand = cms.bool(True),
     MHmin = cms.double(120.),
     MHmax = cms.double(130.)
@@ -88,9 +88,9 @@ process.BkgMCsamples = cms.VPSet(
 
 process.data = cms.VPSet(
     
-    cms.PSet(  Name = cms.string('Data'),  File = cms.string('DoubleEG')  ),
-    cms.PSet(  Name = cms.string('Data'),  File = cms.string('DoubleEG_RunBCD')  ),
-    cms.PSet(  Name = cms.string('Data'),  File = cms.string('DoubleEG_RunEFGH')  )
+    cms.PSet(  Name = cms.string('Data'),  File = cms.string('DoubleEG')  )
+    #cms.PSet(  Name = cms.string('Data'),  File = cms.string('DoubleEG_RunBCD')  ),
+    #cms.PSet(  Name = cms.string('Data'),  File = cms.string('DoubleEG_RunEFGH')  )
         
 )
 

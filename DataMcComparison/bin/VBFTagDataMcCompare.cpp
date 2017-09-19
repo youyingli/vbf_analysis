@@ -117,7 +117,7 @@ int main( int argc, char* argv[] ){
         if (useQCD) comparePlot.SetBkgComp( QCDFile, "QCD", kOrange+7, 1001, scale_factor );
         comparePlot.SetData(File); 
         comparePlot.SetLogScale(isLogScale);
-        comparePlot.DrawDriven(XaxisName);
+        comparePlot.DrawDriven(XaxisName,"");
     }
 
 return 0;
