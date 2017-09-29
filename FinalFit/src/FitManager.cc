@@ -1,5 +1,11 @@
 #include "vbf_analysis/FinalFit/interface/FitManager.h"
 #include "RooRealVar.h"
+#include "RooDataHist.h"
+#include "RooHistPdf.h"
+#include "RooPlot.h"
+#include "RooRandom.h"
+
+#include "TCanvas.h"
 
 #include "boost/algorithm/string/classification.hpp"
 #include "boost/algorithm/string/split.hpp"
@@ -15,41 +21,34 @@ FitManager::FitManager (const RooArgSet& varset, RooAbsPdf* pdf):
     _params->snapshot(_orisnapshot);
     string varstr = _params->contentsString();
     boost::split(_varstrs, varstr, boost::is_any_of(","));
-    _dhist = nullptr;
     _isbinnedfit = false;
+    _is1DFit = false;
+    if (_varset->getSize() == 1) {
+        RooRealVar* var = (RooRealVar*) _varset->first();
+        _initobsrange = make_pair(var->getMin(), var->getMax());
+        _is1DFit = true;
+    }
 }
 
 FitManager::~FitManager ()
 {
-    delete _varset;
-    delete _dhist;
-}
-
-void FitManager::SetDataSetFitted (RooDataSet* dataset, bool isbinned, int nbin)
-{
-    if (isbinned) {
-        delete _dhist;
+    if (_is1DFit) {
         RooRealVar* var = (RooRealVar*) _varset->first();
-        var->setBins(nbin);
-        _nbin = nbin;
-        _dhist = new RooDataHist("dhist", "", RooArgSet(*var), *dataset);
-        _isbinnedfit = true;
-    } else {
-        _dset = dataset;
-        _isbinnedfit = false;
+        var->setRange(_initobsrange.first, _initobsrange.second);
     }
+    delete _varset;
 }
 
-void FitManager::ImportTH1 (TH1* histfitted) 
+void FitManager::SetDataSetFitted (RooDataSet* dataset)
 {
-    delete _dhist;
-    _dhist = new RooDataHist("dhist", "", RooArgList(*_varset), histfitted);
-    _nbin = histfitted->GetNbinsX();
-    _isbinnedfit = true;
+    _dset = dataset;
 }
 
-void FitManager::UseUnBinnedFitting (double minvar, double maxvar)
+void FitManager::UseUnBinnedFitting (double minvar, double maxvar, bool isExtended)
 {
+    RooRealVar* var = (RooRealVar*) _varset->first();
+    _data = UnWgtDataSetBuilder(var, _dset, "unbinned", minvar, maxvar);
+
     int stat = -1;
     int count = 1;
     while (stat != 0) {
@@ -58,36 +57,38 @@ void FitManager::UseUnBinnedFitting (double minvar, double maxvar)
             cout << "Please change the values or the range of parameters in " << _pdf->GetName() << " PDF !!" << endl;
             exit(0);
         }
-        _fitres = _pdf->fitTo(*_dset, Minimizer("Minuit2","minimize"), Save(true), SumW2Error(true), Strategy(1), Range(minvar, maxvar));
+        const RooCmdArg& arg = isExtended ? Extended(true) : RooCmdArg::none();
+        _fitres = _pdf->fitTo(*_data, Minimizer("Minuit2", "minimize"), Save(true), Strategy(1), arg);
         stat = _fitres->status();
         if (stat != 0) _params->assignValueOnly(_fitres->randomizePars());
         count++;
     }
 }
 
-void FitManager::Use1DBinnedFitting (double minvar, double maxvar)
+void FitManager::Use1DBinnedFitting (int nbin, double minvar, double maxvar)
 {
     if (_varset->getSize() != 1) {
         cout << "Binned fit only supports 1 dimensional fitting!" << endl;
         exit(0);
     }
+
+    RooRealVar* var = (RooRealVar*) _varset->first();
+    _data = UnWgtDataSetBuilder(var, _dset, "binned", minvar, maxvar, nbin);
+
     int stat = -1;
     int count = 1;
-    RooRealVar* var = (RooRealVar*) _varset->first();
-    var->setRange("range", minvar, maxvar);
     while (stat != 0) {
         if (count>5) {
             cout << "Don't find the stable fitting for " << _pdf->GetName() << " PDF!" << endl;
             cout << "Please change the values or the range of parameters in " << _pdf->GetName() << " PDF !!" << endl;
             exit(0);
         }
-        _fitres = _pdf->chi2FitTo(*_dhist, Minimizer("Minuit2","minimize"), Save(true), DataError(RooAbsData::Auto), Strategy(1), Range("range"));
+        _fitres = _pdf->fitTo(*_data, Minimizer("Minuit2","minimize"), Save(true), Strategy(1));
         stat = _fitres->status();
         if (stat != 0) _params->assignValueOnly(_fitres->randomizePars());
         count++;
     }
-    _fullrange = var->getMax() - var->getMin();
-    _fitrange = maxvar - minvar;
+    _isbinnedfit = true;
 }
 
 void FitManager::SetConstParam (const string& paramname, bool flag)
@@ -127,10 +128,18 @@ void FitManager::SetOriginalPdf ()
 
 double FitManager::GetChi2OverDof () const
 {
-    int nbin = _fitrange / (_fullrange / _nbin);
+    if (!_isbinnedfit) {
+        cout << "Please use bin likelihood fit to get this information" << endl;
+        exit(0);
+    }
+    RooRealVar* var = (RooRealVar*) _varset->first();
+    RooPlot* chi2plot = var->frame();
+    _data->plotOn(chi2plot, Name("data"));
+    _pdf->plotOn(chi2plot, Name("pdf"));
     int nfreeparams = _fitres->floatParsFinal().getSize();
-    cout << "Chi2 : " << _fitres->minNll() << " D.O.F : " << nbin - nfreeparams << endl;
-    return _fitres->minNll() / (nbin - nfreeparams);
+    double chi2overdof = chi2plot->chiSquare("pdf", "data", nfreeparams);
+    cout << "Chi2 : " << chi2overdof * (_nbin - nfreeparams) << " D.O.F : " << _nbin - nfreeparams << endl;
+    return chi2overdof;
 }
 
 void FitManager::ShowParamsInfo () 
@@ -151,4 +160,36 @@ void FitManager::HasParameter (const string& name)
         cout << "Don't find '" << name << "' parameter in '" << _pdf->GetName() << "' PDF" << endl; 
         exit(0);
     }
+}
+
+RooAbsData* FitManager::UnWgtDataSetBuilder (RooRealVar* var, RooDataSet* dset, string datatype, double minvar, double maxvar, int nbin) 
+{
+    double min = TMath::Max(minvar, var->getMin());
+    double max = TMath::Min(maxvar, var->getMax());
+    string varname = var->GetName();
+    RooDataSet* reducedate = (RooDataSet*) dset->reduce(Form("%s > %f && %s < %f", varname.c_str(), min, varname.c_str(), max));
+    var->setRange(min, max);
+    RooAbsData* datamodified = nullptr;
+
+    if (dset->isWeighted()) {
+        if (datatype == "unbinned") {
+            var->setBins(dset->numEntries());
+            RooDataHist datahist("datahist", "", RooArgSet(*var), *reducedate);
+            RooHistPdf histpdf("histpdf", "", RooArgSet(*var), datahist);
+            RooRandom::randomGenerator()->SetSeed(0);
+            datamodified = histpdf.generate(RooArgSet(*var), dset->numEntries());
+        } else if (datatype == "binned") {
+            var->setBins(nbin);
+            RooDataHist datahist("datahist", "", RooArgSet(*var), *reducedate);
+            RooHistPdf histpdf("histpdf", "", RooArgSet(*var), datahist);
+            datamodified = histpdf.generateBinned(RooArgSet(*var), dset->numEntries(), kTRUE, kFALSE);
+        } else {
+            cout << "Please input binned or unbinned" << endl;
+            exit(0);
+        }
+    } else {
+        datamodified = reducedate;
+    }
+
+    return datamodified;
 }

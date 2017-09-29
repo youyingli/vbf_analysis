@@ -17,42 +17,30 @@ int main(){
     RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
     RooMsgService::instance().setSilentMode(true);
 
-    string outdir_ = "/wk_cms/youying/CMSSW_8_0_26_patch1/src/VBFTag/FinalFit/";
-    system(Form("mkdir -p %s",outdir_.c_str()));
-    string infile = "/wk_cms/youying/CMSSW_8_0_26_patch1/src/VBFTag/output_DoubleEG.root";
+    string outdir = "/wk_cms2/youying/myWork/CMSSW_9_2_8/src/Fit/";
+    system(Form("mkdir -p %s", outdir.c_str()));
+    string infile = "/wk_cms2/youying/myWork/CMSSW_9_2_8/src/FullDataSetPacked.root";
 
     map<string, RooExtendPdf*> exsig;
-    map<string,string> sigfile;
-    sigfile["ggf"]="/wk_cms/youying/CMSSW_8_0_26_patch1/src/VBFTag/output_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8.root";
-    sigfile["vbf"]="/wk_cms/youying/CMSSW_8_0_26_patch1/src/VBFTag/output_VBFHToGG_M125_13TeV_amcatnlo_pythia8.root";
-    
-    for (const auto& it : sigfile) {
-
-        TFile* file = TFile::Open(it.second.c_str());
-        RooWorkspace* ws = (RooWorkspace*) file -> Get("ws");
-        RooRealVar* mass = (RooRealVar*) ws->var("CMS_hgg_mass");
-        RooRealVar* weight = (RooRealVar*) ws->var("weight");
-        RooDataSet* data = (RooDataSet*) ws->data("dataset");
-        RooDataSet* data1 = new RooDataSet("fff","",data,RooArgSet(*mass,*weight),0,"weight");
-
-        SigModelBuilder sigModelBuilder(mass, data1, it.first.c_str(), outdir_);
-        //sigModelBuilder.FTestSelector();
-        sigModelBuilder.AlterFTestSelector();
-        sigModelBuilder.MakeFTestPlot();
-
-        exsig.insert(make_pair(it.first, sigModelBuilder.GetBestOfFitPdf()));
-    }
-
-    
-
-
-
+    vector<string> sigdata;
+    sigdata.push_back("vbf_125_dataset");
+    sigdata.push_back("ggh_125_dataset");
 
     TFile* file = TFile::Open(infile.c_str());
-    RooWorkspace* ws = (RooWorkspace*) file -> Get("ws");
+    RooWorkspace* ws = (RooWorkspace*) file -> Get("workspace");
     RooRealVar* mass = (RooRealVar*) ws->var("CMS_hgg_mass");
-    RooDataSet* data = (RooDataSet*) ws->data("dataset");
+    
+    for (const auto& it : sigdata) {
 
+        RooDataSet* data = (RooDataSet*) ws->data(it.c_str());
+        SigModelBuilder sigModelBuilder(mass, data, it.c_str(), outdir);
+        sigModelBuilder.FTestSelector();
+        //sigModelBuilder.AlterFTestSelector();
+        sigModelBuilder.MakeFTestPlot();
+
+        exsig.insert(make_pair(it.substr(0,7), sigModelBuilder.GetBestOfFitPdf()));
+    }
+    mass->Print("v");
 
     vector<string> aa;
     aa.push_back("Bernstein");
@@ -60,11 +48,14 @@ int main(){
     aa.push_back("PowerLaw2");
     aa.push_back("Exponential2");
 
-    BkgModelBuilder bkgmodelbuilder(mass,data,outdir_);
+    RooDataSet* data = (RooDataSet*) ws->data("DoubleEG_2016");
+    RooDataSet* reducedata = (RooDataSet*) data->reduce(RooArgSet(*mass));
+
+    BkgModelBuilder bkgmodelbuilder(mass,reducedata,outdir);
     bkgmodelbuilder.SetBkgPdfSource(aa);
     bkgmodelbuilder.FTestSelector(7);
     bkgmodelbuilder.SetSignalPdf(exsig);
-    bkgmodelbuilder.MakeEnvelopePlot();
+    bkgmodelbuilder.MakeEnvelopePlot(false, true);
 
 return 0;
 }

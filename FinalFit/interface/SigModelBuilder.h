@@ -15,7 +15,7 @@ class SigModelBuilder {
 
     public:
 
-        SigModelBuilder (RooRealVar* mass, RooDataSet* data, std::string samplename, std::string outdir);
+        SigModelBuilder (RooRealVar* mass, RooDataSet* data, const std::string& samplename, const std::string& outdir);
         ~SigModelBuilder ();
 
         void FTestSelector ();
@@ -26,13 +26,13 @@ class SigModelBuilder {
 
     private:
 
-        int bestorder_;
-        RooRealVar* mass_;
-        RooDataSet* data_;
-        std::string samplename_;
-        std::string outdir_;
+        RooRealVar* _mass;
+        RooDataSet* _data;
+        std::string _samplename;
+        std::string _outdir;
+        RooDataSet* _unweightdset;
 
-        std::vector<RooAbsPdf*> SigPdfSet_;
+        std::vector<RooAbsPdf*> _sigpdfset;
 
 };
 

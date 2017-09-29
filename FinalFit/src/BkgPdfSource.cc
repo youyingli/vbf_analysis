@@ -15,7 +15,7 @@ using namespace RooFit;
 
 RooAbsPdf* EnvelopePdf (RooRealVar* var, string pdfType, int order) {
 
-    RooAbsPdf* chosenpdf = NULL;
+    RooAbsPdf* chosenpdf = nullptr;
 
     if (pdfType == "Bernstein") {
         RooRealVar* param;
@@ -62,7 +62,7 @@ RooAbsPdf* EnvelopePdf (RooRealVar* var, string pdfType, int order) {
     if (pdfType == "PowerLaw") {
 
         if (order%2 != 0) {
-            return NULL;
+            return nullptr;
         } else {
            
             int nterm = order/2;
@@ -89,7 +89,7 @@ RooAbsPdf* EnvelopePdf (RooRealVar* var, string pdfType, int order) {
     if (pdfType == "Exponential") {
                                                                                                                                                             
         if (order%2 != 0) {
-            return NULL;
+            return nullptr;
         } else {
                
             int nterm = order/2;
@@ -115,7 +115,7 @@ RooAbsPdf* EnvelopePdf (RooRealVar* var, string pdfType, int order) {
     //------------------------
     if (pdfType == "Exponential2"){
         if (order%2 == 0){
-            return NULL;
+            return nullptr;
         } else {
             int nfrac = (order-1)/2;
             int npow = order - nfrac;
@@ -139,7 +139,7 @@ RooAbsPdf* EnvelopePdf (RooRealVar* var, string pdfType, int order) {
 
     if (pdfType == "PowerLaw2"){
         if(order%2 == 0){
-            return NULL;
+            return nullptr;
         } else {
                                                                                                                                            
             int nfrac = (order-1)/2;

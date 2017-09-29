@@ -1,6 +1,7 @@
 
 #include "vbf_analysis/FinalFit/interface/EnvelopeBuilder.h"
-#include "vbf_analysis/Utils/interface/PlotLibrary.h"
+#include "vbf_analysis/FinalFit/interface/FitManager.h"
+#include "vbf_analysis/Utils/interface/PlotMgrLib.h"
 
 #include <iostream>
 
@@ -20,10 +21,10 @@ using namespace RooFit;
 
 
 EnvelopeBuilder::EnvelopeBuilder (RooRealVar* var, RooDataSet* data, vector<RooAbsPdf*> multipdf, string outdir):
-    var_(var),
-    data_(data),
-    multipdf_(multipdf),
-    outdir_(outdir)
+    _var(var),
+    _data(data),
+    _multipdf(multipdf),
+    _outdir(outdir)
 {
     hasSignal_ = false;
 }
@@ -36,12 +37,11 @@ double EnvelopeBuilder::GetNormNLL (double norm, double varlow, double varhigh) 
 
     double bestFitNll=1.e9;
 
-    for (const auto& it : multipdf_) {
-        var_->setRange("errRange",varlow,varhigh);
+    for (const auto& it : _multipdf) {
+        _var->setRange("errRange",varlow,varhigh);
         RooRealVar normVar("norm","",0.,1.e6);
         RooExtendPdf extPdf("extPdf", "", *it, normVar, "errRange");
-        RooAbsReal* nll = extPdf.createNLL(*data_,Extended());
-    
+        RooAbsReal* nll = extPdf.createNLL(*_data,Extended());    
         normVar.setConstant(false);
         normVar.setVal(norm);
         normVar.setConstant(true);
@@ -49,10 +49,12 @@ double EnvelopeBuilder::GetNormNLL (double norm, double varlow, double varhigh) 
         RooMinimizer minim(*nll);
         minim.setStrategy(0);
         minim.migrad();
-        double corrNll = 2 * (nll->getVal()) + it->getParameters(*data_)->getSize();
+
+        double corrNll = 2 * (nll->getVal()) + it->getParameters(*_data)->getSize();
         if(corrNll<bestFitNll) bestFitNll = corrNll;
     }
     return bestFitNll;
+
 }
 
 double EnvelopeBuilder::GetAsymmetryError (double bestPoint ,double nllbest, double boundary, double varlow, double varhigh, double diff) {
@@ -91,7 +93,7 @@ double EnvelopeBuilder::GetAsymmetryError (double bestPoint ,double nllbest, dou
 
         if (nits > 20) {
             return value;
-            DownEdge = TMath::Max(0., DownEdge-20.);
+            DownEdge = TMath::Max(0., DownEdge - 20.);
             UpEdge += 20.;
             nits = 0;
             if(TMath::Abs(valueNll) > 2.e4) return 0;
@@ -100,26 +102,25 @@ double EnvelopeBuilder::GetAsymmetryError (double bestPoint ,double nllbest, dou
     return value;
 }
 
-void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
+void EnvelopeBuilder::BuilderCore (bool isblind, bool iscombined) {
 
-    ARTKIT::SetGlobalStyle();
+    plotmgr::SetGlobalStyle();
      
-    RooPlot* plot = var_->frame();
+    RooPlot* plot = _var->frame();
     plot->GetXaxis()->SetLabelSize(0.);
     plot->GetYaxis()->SetTitleSize(0.04);
     plot->GetYaxis()->SetLabelSize(0.04);
-    data_->plotOn(plot,Binning(80),Invisible());
-    RooHist* plotdata = (RooHist*)plot->getObject(plot->numItems()-1);
-    TObject* dataleg = (TObject*)plot->getObject(plot->numItems()-1);
-//    if(combine) bestpdf_->plotOn(plot,LineColor(kRed),LineWidth(3),LineStyle(7));
-//    else bestpdf_->plotOn(plot,LineColor(kRed),LineWidth(3));     
-    bestpdf_->plotOn(plot,LineColor(kRed),LineWidth(3));     
-    RooCurve* bestPdfcurve = (RooCurve*)plot->getObject(plot->numItems()-1);
+    _data->plotOn(plot, Binning(80), Invisible());
+    RooHist* plotdata = (RooHist*)plot->getObject(plot->numItems() - 1);
+    TObject* dataleg = (TObject*)plot->getObject(plot->numItems() - 1);
+    if(iscombined) _bestpdf->plotOn(plot,LineColor(kRed),LineWidth(3),LineStyle(7));
+    else _bestpdf->plotOn(plot,LineColor(kRed),LineWidth(3));     
+    RooCurve* bestPdfcurve = (RooCurve*)plot->getObject(plot->numItems() - 1);
 
-    TLegend* leg = ARTKIT::newLegend();
-    leg -> SetNColumns(2);
-    leg->AddEntry(dataleg,"data","LEP");
-    leg->AddEntry(bestPdfcurve,"Bkg fit","L");
+    TLegend* leg = plotmgr::NewLegend();
+    leg->SetNColumns(2);
+    leg->AddEntry(dataleg, "data", "LEP");
+    leg->AddEntry(bestPdfcurve, "Bkg fit", "L");
 
     TGraphAsymmErrors* oneSigmaband = new TGraphAsymmErrors();   //SetName
     TGraphAsymmErrors* twoSigmaband = new TGraphAsymmErrors();
@@ -161,9 +162,9 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
         p++;
     }
 
-    TCanvas canv("canv","",600,700);
-    canv.cd();
-    TPad* toppad = ARTKIT::TopPad();
+    TCanvas* canv = plotmgr::NewCanvas();
+    canv->cd();
+    TPad* toppad = plotmgr::NewTopPad();
     toppad->Draw();
     toppad->cd();
     plot->Draw();
@@ -176,8 +177,8 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     oneSigmaband->SetFillColor(kGreen);
     oneSigmaband->SetMarkerColor(kGreen);
     oneSigmaband->Draw("L3 same");
-    leg->AddEntry(oneSigmaband,"#pm1#sigma","F");
-    leg->AddEntry(twoSigmaband,"#pm2#sigma","F");
+    leg->AddEntry(oneSigmaband, "#pm1#sigma", "F");
+    leg->AddEntry(twoSigmaband, "#pm2#sigma", "F");
 
     twoSigmaband_r->SetLineColor(kYellow);
     twoSigmaband_r->SetFillColor(kYellow);
@@ -186,54 +187,39 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     oneSigmaband_r->SetFillColor(kGreen);
     oneSigmaband_r->SetMarkerColor(kGreen);
 
-//    RooPlot*splot = var_-> frame();
-
-    RooArgList* sigpdfset = new RooArgList();
-    RooArgList* sigpdfsetf = new RooArgList();
-    RooAddPdf* sigTotalPdf = 0;
-    int color[7] = {kBlue,kRed,kMagenta,kGreen+1,kOrange+7,kAzure+10,kBlack};
+    RooAddPdf* sigTotalPdf = nullptr;
     if (hasSignal_) {
-        int i = 0;
-        for (const auto& it : exsigpdf_) {
-            //it.second->plotOn(plot, Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(color[i]), LineWidth(1));
-            it.second->plotOn(plot, Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(color[i]), LineWidth(1), Invisible());
-            RooCurve* curve = (RooCurve*)plot->getObject(plot->numItems()-1);
-            RooRealVar* number = new RooRealVar(it.first.c_str(), "", curve->average(100.,180.)*80., 0., 1000000.); 
-            number->setConstant(true);
-            //it.second->plotOn(plot,Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(color[i]), LineWidth(1), FillColor(color[i]), FillStyle(3001), DrawOption("F"));
-            //leg->AddEntry((TObject*)plot->getObject(plot->numItems()-1), Form("%s (M_{H} = 125GeV)",it.first.c_str()), "F");
+        RooArgList* sigpdfset = new RooArgList();
+        RooArgList* totalpdfset = new RooArgList();
+        for (const auto& it : exsigpdf_) {   
             sigpdfset->add(*(it.second));
-            sigpdfsetf->add(*number);
-            i++;
+            totalpdfset->add(*(it.second));
         }
-        sigTotalPdf = new RooAddPdf("total", "", *sigpdfset, *sigpdfsetf);
-        //sigTotalPdf->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kViolet+2),LineWidth(3),LineStyle(2));
+        sigTotalPdf = new RooAddPdf("total", "", *sigpdfset);
         sigTotalPdf->plotOn(plot, Normalization(1.0,RooAbsReal::RelativeExpected), LineColor(kBlue), LineWidth(3));
         sigTotalPdf->plotOn(plot, Normalization(1.0,RooAbsReal::RelativeExpected), LineColor(kBlue), LineWidth(3), FillColor(kBlue), FillStyle(3001), DrawOption("F"));
-        //leg->AddEntry((TObject*)plot->getObject(plot->numItems()-1), "Total(M_{H} = 125GeV)", "L");
         leg->AddEntry((TObject*)plot->getObject(plot->numItems()-1), "Signal (M_{H} = 125GeV)", "L");
-       /* if (combine) {
-            sigTotalPdf.plotOn(splot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(3),LineStyle(1));
-            RooRealVar fsig("fsig","",fvbf.getValV()+fggf.getValV(),0.,100000.); fsig.setConstant(true);
-            RooRealVar fbkg("fbkg","",bestPdfcurve->average(100.,180.)*80.,0.,100000.); fbkg.setConstant(true);
-            RooAddPdf TotalPDF("TotalPDF","",RooArgList(*bestpdf_,sigTotalPdf),RooArgList(fbkg,fsig));
+        if (iscombined) {
+            RooRealVar nbkg("nbkg","",bestPdfcurve->average(100.,180.)*80.,0.,100000.); nbkg.setConstant(true);
+            RooExtendPdf bkgextpdf("bkgextpdf", "", *_bestpdf, nbkg);
+            totalpdfset->add(bkgextpdf);
+            RooAddPdf TotalPDF("TotalPDF", "", *totalpdfset);
             TotalPDF.plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected),LineColor(kRed),LineWidth(3),LineStyle(1));
-        }*/
-        
+        } 
     }
 
     if (isblind) {
-       var_->setRange("unblind_low",100.,115.);
-       var_->setRange("unblind_high",135.,180.);
-       data_->plotOn(plot,Binning(80),CutRange("unblind_low,unblind_high"),MarkerSize(0.8),XErrorSize(0));
+       _var->setRange("unblind_low", 100., 115.);
+       _var->setRange("unblind_high", 135., 180.);
+       _data->plotOn(plot, Binning(80), CutRange("unblind_low,unblind_high"), MarkerSize(0.8), XErrorSize(0));
     } else {
-       data_->plotOn(plot,Binning(80),MarkerSize(0.8));
+       _data->plotOn(plot, Binning(80), MarkerSize(0.8), XErrorSize(0));
     }
 
     plot->Draw("same");
     leg->Draw("same");
 
-    ARTKIT::SetCMSandLUMI(35.87);
+    plotmgr::SetCMSandLUMI(35.87);
     TLatex lex;
     lex.SetNDC(true);
     lex.SetTextFont(62);
@@ -242,9 +228,9 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     lex.SetTextFont(42);
     lex.DrawLatex(0.22, 0.825, "H #rightarrow #gamma#gamma");
 
-    canv.Update();
-    canv.cd();
-    TPad* bottompad = ARTKIT::BottomPad();
+    canv->Update();
+    canv->cd();
+    TPad* bottompad = plotmgr::NewBottomPad();
     bottompad->Draw();
     bottompad->cd();
 
@@ -254,24 +240,20 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     TGraphAsymmErrors *hdatasub = new TGraphAsymmErrors(npoint);
 
     for (int i=0; i < npoint; ++i) {
-
-        plotdata->GetPoint(i,xtmp,ytmp);
+        plotdata->GetPoint(i, xtmp, ytmp);
         double bkgvalue = bestPdfcurve->interpolate(xtmp);
         if (isblind) {
             if(xtmp > 115. && xtmp < 135.) continue;
         }
         double errorUp = plotdata -> GetErrorYhigh(i);
         double errorDown = plotdata -> GetErrorYlow(i);
-        hdatasub->SetPoint(i,xtmp,ytmp-bkgvalue);
-        hdatasub->SetPointError(i,0.,0.,errorDown,errorUp);
-
+        hdatasub->SetPoint(i, xtmp, ytmp - bkgvalue);
+        hdatasub->SetPointError(i, 0., 0., errorDown, errorUp);
     }
 
     TH1 *hdata = new TH1D("hdata","",80,100,180);
-    hdata->SetMaximum(hdatasub->GetHistogram()->GetMaximum()+1);
-    hdata->SetMinimum(hdatasub->GetHistogram()->GetMinimum()-1);
-    //hdata->GetYaxis()->SetTitle("data - best fit PDF");
-    //hdata->GetYaxis()->SetTitleSize(0.12);
+    hdata->SetMaximum(hdatasub->GetHistogram()->GetMaximum() + 1);
+    hdata->SetMinimum(hdatasub->GetHistogram()->GetMinimum() - 1);
     hdata->GetYaxis()->SetLabelSize(0.11);
     hdata->GetXaxis()->SetTitle("M_{#gamma#gamma} (GeV)");
     hdata->GetXaxis()->SetTitleSize(0.11);
@@ -282,33 +264,34 @@ void EnvelopeBuilder::BuilderCore (bool isblind, bool combine) {
     hdata->GetYaxis()->SetNdivisions(905);
 
     TLatex* latex2 = new TLatex();
-    latex2 -> SetNDC();
-    latex2 -> SetTextFont(42);
-    latex2 -> SetTextSize(0.13);
-    latex2 -> DrawText(0.7,0.86,"Bkg subtracted");
+    latex2->SetNDC();
+    latex2->SetTextFont(42);
+    latex2->SetTextSize(0.13);
+    latex2->DrawText(0.7, 0.86, "Bkg subtracted");
          
-    TLine *line3 = new TLine(100,0.,180,0.);
-    line3->SetLineColor(kRed);
-    line3->SetLineWidth(3);
-    line3->Draw();
-    /*
-    if (combine) {
-        line3->SetLineStyle(7);
+    if (iscombined) {
+        TLine* line = plotmgr::NewHorizontalLine(hdata, 0., kRed, 7, 3);
+        line->Draw();
+        RooPlot*splot = _var->frame();
+        sigTotalPdf->plotOn(splot, Normalization(1.0, RooAbsReal::RelativeExpected), LineColor(kRed), LineWidth(3), LineStyle(1));
         splot->Draw("SAME");
-    }*/
+    } else {
+        TLine *line = plotmgr::NewHorizontalLine(hdata, 0., kRed, 1, 3);
+        line->Draw();
+    }
     hdatasub->Draw("PESAME");
     hdatasub->SetMarkerStyle(20);
     hdatasub->SetMarkerSize(0.8);
 
-    canv.Update();
-    canv.Print(Form("%s/envelopepdf.pdf",outdir_.c_str()));
+    canv->Update();
+    canv->Print(Form("%s/envelopepdf.pdf",_outdir.c_str()));
 
 }
 
 void EnvelopeBuilder::SetBestPdf (RooAbsPdf* bestpdf)
 {
-    bestpdf->fitTo(*data_);
-    bestpdf_ = bestpdf;
+    bestpdf->fitTo(*_data);
+    _bestpdf = bestpdf;
 }
 
 void EnvelopeBuilder::SetRangeAndRes (double resolution, double min, double max)

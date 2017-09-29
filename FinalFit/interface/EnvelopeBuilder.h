@@ -17,7 +17,7 @@ class EnvelopeBuilder {
         void SetBestPdf (RooAbsPdf* bestpdf);
         void SetRangeAndRes (double resolution, double min, double max);
         void SetSignalPdf (std::map<std::string, RooExtendPdf*> exsigpdf);
-        void BuilderCore (bool isblind = true, bool combine =true);
+        void BuilderCore (bool isblind = true, bool iscombined =false);
     
     private:
 
@@ -25,11 +25,11 @@ class EnvelopeBuilder {
         double resolution_;
         double min_;
         double max_;
-        RooRealVar* var_;
-        RooAbsPdf* bestpdf_;
-        RooDataSet* data_;
-        std::vector<RooAbsPdf*> multipdf_;
-        std::string outdir_;
+        RooRealVar* _var;
+        RooAbsPdf* _bestpdf;
+        RooDataSet* _data;
+        std::vector<RooAbsPdf*> _multipdf;
+        std::string _outdir;
         std::map<std::string, RooExtendPdf*> exsigpdf_;
 
         double GetNormNLL (double norm, double varlow, double varhigh);
